@@ -376,6 +376,12 @@
       font-size: inherit; font-family: inherit; cursor: pointer;
       text-decoration: underline; padding: 0;
     }
+    .login-fine-print {
+      font-size: 0.78rem;
+      color: #b0a090;
+      line-height: 1.5;
+      margin-top: 1rem;
+    }
     .login-error {
       color: #c0392b;
       font-size: 0.85rem;
@@ -1145,6 +1151,7 @@
         onkeydown="if(event.key==='Enter') requestMagicLink()">
       <button class="login-btn" id="login-btn" onclick="requestMagicLink()">Send me a magic link ✨</button>
       <div class="login-error" id="login-error"></div>
+      <p class="login-fine-print">Enter your email and we'll send you a secure link to sign in — no password needed. The game is completely free. We'll never share or sell your data.</p>
     </div>
 
     <div id="login-sent" style="display:none">

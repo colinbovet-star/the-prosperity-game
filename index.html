@@ -592,56 +592,121 @@
     }
 
     /* ---- Today card ---- */
+    /* ---- Today card ---- */
     .today-card {
-      background: linear-gradient(150deg, #fffcf2 0%, #fff5d0 60%, #ffedb0 100%);
+      background: #fffdf8;
       border: 1.5px solid #e0c87a;
       border-radius: var(--radius-lg);
-      padding: 2rem 1.75rem 1.6rem;
+      padding: 0;
       margin-bottom: 2rem;
       box-shadow: 0 4px 20px rgba(200,149,42,0.14);
+      overflow: hidden;
+    }
+
+    /* Deposit hero */
+    .deposit-hero {
+      background: linear-gradient(150deg, #2a1f0a 0%, #4a3310 50%, #3a2808 100%);
+      padding: 2rem 1.75rem 1.8rem;
+      text-align: center;
       position: relative;
       overflow: hidden;
     }
-    .today-card::before {
+    .deposit-hero::before {
       content: '';
       position: absolute;
-      top: -40px; right: -40px;
-      width: 150px; height: 150px;
-      background: radial-gradient(circle, rgba(255,220,100,0.25), transparent 70%);
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(255,200,60,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(255,180,40,0.12) 0%, transparent 50%);
       pointer-events: none;
     }
-    .today-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 1.4rem;
-    }
-    .today-deposit-label {
-      font-size: 0.72rem;
+    .deposit-from {
+      font-size: 0.68rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 0.4rem;
+      letter-spacing: 0.18em;
+      color: rgba(255,210,100,0.7);
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+    .deposit-amount-wrap {
+      position: relative;
+      margin-bottom: 0.6rem;
     }
     .today-amount {
-      font-size: 3.4rem;
+      font-size: 4rem;
       font-weight: bold;
-      color: var(--brown);
+      color: #ffd86e;
       line-height: 1;
       letter-spacing: -0.02em;
-      text-shadow: 0 1px 3px rgba(120,80,0,0.12);
+      text-shadow: 0 0 40px rgba(255,210,80,0.5), 0 2px 8px rgba(0,0,0,0.4);
+      display: inline-block;
     }
-    @media (max-width: 420px) { .today-amount { font-size: 2.6rem; } }
-    .today-meta {
-      text-align: right;
+    @keyframes depositPop {
+      0%   { opacity: 0; transform: scale(0.7) translateY(12px); }
+      60%  { transform: scale(1.06) translateY(-2px); }
+      80%  { transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes shimmer {
+      0%, 100% { text-shadow: 0 0 40px rgba(255,210,80,0.5), 0 2px 8px rgba(0,0,0,0.4); }
+      50%       { text-shadow: 0 0 60px rgba(255,220,100,0.9), 0 2px 8px rgba(0,0,0,0.4); }
+    }
+    .today-amount.animating {
+      animation: depositPop 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards,
+                 shimmer 2s ease-in-out 0.7s 2;
+    }
+    .deposit-meta-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+    }
+    .deposit-date {
+      font-size: 0.82rem;
+      color: rgba(255,220,130,0.75);
+    }
+    .deposit-day-badge {
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(255,200,60,0.18);
+      color: rgba(255,210,110,0.9);
+      border: 1px solid rgba(255,200,60,0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+    }
+    .deposit-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .deposit-particles span {
+      position: absolute;
+      font-size: 1rem;
+      opacity: 0;
+      animation: floatUp 2s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 0.9; transform: translateY(0) scale(1); }
+      100% { opacity: 0;   transform: translateY(-80px) scale(0.5); }
+    }
+
+    /* Spending area */
+    .today-spend-area {
+      padding: 1.4rem 1.75rem 1.6rem;
+      background: linear-gradient(150deg, #fffcf2 0%, #fff8e8 100%);
+    }
+    .today-remaining {
       font-size: 0.82rem;
       color: var(--text-muted);
-      line-height: 1.65;
+      margin-bottom: 0.75rem;
     }
-    .today-meta strong { display: block; font-size: 1rem; color: var(--brown); }
     .today-divider {
       border: none;
-      border-top: 1px solid rgba(200,149,42,0.25);
+      border-top: 1px solid rgba(200,149,42,0.2);
       margin: 0 0 1.2rem;
     }
     .today-prompt {
@@ -1346,18 +1411,24 @@
 
   <!-- Today -->
   <div id="today-section" class="today-card" style="display:none">
-    <div class="today-card-header">
-      <div>
-        <div class="today-deposit-label">Today's Deposit</div>
+
+    <!-- Deposit hero -->
+    <div class="deposit-hero">
+      <div class="deposit-particles" id="deposit-particles"></div>
+      <div class="deposit-from">The Universe has deposited</div>
+      <div class="deposit-amount-wrap">
         <div class="today-amount" id="today-amount-display"></div>
-        <div class="today-remaining" id="today-remaining" style="display:none"></div>
       </div>
-      <div class="today-meta">
-        <strong id="today-date-display"></strong>
-        <span id="today-day-label"></span>
+      <div class="deposit-meta-row">
+        <span class="deposit-date" id="today-date-display"></span>
+        <span class="deposit-day-badge" id="today-day-label"></span>
       </div>
     </div>
-    <hr class="today-divider" />
+
+    <!-- Spending area -->
+    <div class="today-spend-area">
+      <div class="today-remaining" id="today-remaining" style="display:none"></div>
+      <hr class="today-divider" />
 
     <!-- Inspiration section -->
     <div class="inspiration-section">
@@ -1402,6 +1473,7 @@
       <span class="entry-status" id="entry-status"></span>
     </div>
     <div id="prosperity-quote" class="prosperity-quote"></div>
+    </div><!-- end today-spend-area -->
   </div>
 
   <div id="future-notice" style="display:none">
@@ -1741,7 +1813,12 @@
     const todaySection = document.getElementById('today-section');
     todaySection.style.display = 'block';
     todaySection.classList.add('slide-up');
-    document.getElementById('today-amount-display').textContent = formatMoney(todayAmount);
+    const amountEl = document.getElementById('today-amount-display');
+    amountEl.textContent = formatMoney(todayAmount);
+    amountEl.classList.remove('animating');
+    void amountEl.offsetWidth; // force reflow
+    amountEl.classList.add('animating');
+    spawnDepositParticles();
 
     const dateObj = new Date(todayISO() + 'T00:00:00');
     document.getElementById('today-date-display').textContent =
@@ -1813,6 +1890,24 @@
         preview
       };
     }).filter(it => it.desc || it.price);
+  }
+
+  function spawnDepositParticles() {
+    const container = document.getElementById('deposit-particles');
+    if (!container) return;
+    container.innerHTML = '';
+    const emojis = ['✨', '💛', '🌟', '💰', '⭐', '✨', '💫'];
+    for (let i = 0; i < 12; i++) {
+      const span = document.createElement('span');
+      span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      span.style.left   = Math.random() * 100 + '%';
+      span.style.bottom = (20 + Math.random() * 30) + '%';
+      span.style.animationDelay = (Math.random() * 0.8) + 's';
+      span.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
+      span.style.fontSize = (0.8 + Math.random() * 0.8) + 'rem';
+      container.appendChild(span);
+    }
+    setTimeout(() => { if (container) container.innerHTML = ''; }, 3000);
   }
 
   function toggleInspiration(btn) {

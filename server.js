@@ -129,7 +129,7 @@ app.post('/api/auth/verify', (req, res) => {
   if (!row)         return res.status(400).json({ error: 'Invalid link' });
   if (row.used)     return res.status(400).json({ error: 'Link already used' });
   if (new Date(row.expires_at) < new Date()) {
-    return res.status(400).json({ error: 'Link expired — please request a new one' });
+    return res.status(400).json({ error: 'Link expired. Please request a new one.' });
   }
 
   db.prepare('UPDATE magic_tokens SET used = 1 WHERE id = ?').run(row.id);
@@ -358,7 +358,7 @@ function buildReminderEmailHtml(dayNum, formatted) {
             <p style="margin:0 0 8px;font-size:16px;color:#8a6030;">Today's deposit is ready</p>
             <div style="font-size:52px;font-weight:bold;color:#c8952a;letter-spacing:-1px;line-height:1.1;">${formatted}</div>
             <p style="margin:20px 0 28px;font-size:15px;color:#666;line-height:1.6;max-width:380px;margin-left:auto;margin-right:auto;">
-              The Universe has deposited ${formatted} into your account today. Spend it all with joy — imagination has no limits.
+              The Universe has deposited ${formatted} into your account today. Spend it all with joy. Imagination has no limits.
             </p>
             <a href="${BASE_URL}"
                style="display:inline-block;background:linear-gradient(135deg,#c8952a,#e6b84a);color:#fff;text-decoration:none;padding:14px 36px;border-radius:30px;font-size:15px;font-weight:bold;letter-spacing:0.03em;">
@@ -385,7 +385,7 @@ async function sendReminderEmail(to, dayNum, amount) {
   const { data, error } = await resend.emails.send({
     from: 'Prosperity Game <hello@the-prosperity-game.com>',
     to,
-    subject: `Day ${dayNum} — Your ${formatted} is waiting 💛`,
+    subject: `Day ${dayNum}: Your ${formatted} is waiting 💛`,
     html: buildReminderEmailHtml(dayNum, formatted),
   });
   if (error) throw new Error(error.message);

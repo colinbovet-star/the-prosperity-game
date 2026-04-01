@@ -1156,7 +1156,7 @@
     <div class="login-logo">✨</div>
     <h1 class="login-title">Prosperity Game</h1>
     <p class="login-subtitle">Your daily practice in abundance thinking</p>
-    <p class="login-description">Each day, the Universe deposits a growing amount of money into your account — starting at $1,000 and doubling every day. Your only job is to spend it joyfully. Imagining wealth in vivid detail trains your mind to welcome it in real life.</p>
+    <p class="login-description">Each day, the Universe deposits a growing amount of money into your account. Starting at $1,000 on day one, with $1,000 more added every day after. Your only job is to spend it joyfully. Imagining wealth in vivid detail trains your mind to welcome it in real life.</p>
 
     <div id="login-form">
       <input type="email" id="login-email" class="login-input" placeholder="your@email.com"
@@ -1192,12 +1192,12 @@
 
   <!-- Mode cards -->
   <div class="mode-cards">
-    <div class="mode-card" data-mode="linear" onclick="selectMode('linear')">
+    <div class="mode-card selected" data-mode="linear" onclick="selectMode('linear')">
       <div class="mc-icon">📈</div>
       <div class="mc-name">Linear</div>
       <div class="mc-desc">Add the same amount every day<br><em>Day 1: $1k &rarr; Day 2: $2k &rarr; Day 3: $3k</em></div>
     </div>
-    <div class="mode-card selected" data-mode="doubling" onclick="selectMode('doubling')">
+    <div class="mode-card" data-mode="doubling" onclick="selectMode('doubling')">
       <div class="mc-icon">✨</div>
       <div class="mc-name">Doubling</div>
       <div class="mc-desc">Double your money every day<br><em>Day 1: $1k &rarr; Day 2: $2k &rarr; Day 3: $4k</em></div>
@@ -1432,7 +1432,7 @@
   let settings = null;
   let entries = {};
   let todayDayNumber = null;
-  let obMode = 'doubling';
+  let obMode = 'linear';
   let obCustomType = 'add';
   let sCustomType = 'add';
   let historyFilter = 'all';

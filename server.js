@@ -43,7 +43,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS user_settings (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id             INTEGER NOT NULL UNIQUE REFERENCES users(id),
-    game_mode           TEXT    NOT NULL DEFAULT 'doubling',
+    game_mode           TEXT    NOT NULL DEFAULT 'linear',
     start_amount        REAL    NOT NULL DEFAULT 1000,
     start_date          TEXT    NOT NULL DEFAULT (date('now')),
     custom_type         TEXT    DEFAULT 'add',

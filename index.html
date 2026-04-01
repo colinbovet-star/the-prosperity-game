@@ -1747,7 +1747,8 @@
     document.getElementById('today-day-label').textContent = 'Day ' + todayDayNumber;
 
     const todayEntry = entries[todayDayNumber];
-    todayItems = todayEntry ? parseItems(todayEntry) : [];
+    const parsed = todayEntry ? parseItems(todayEntry) : [];
+    todayItems = parsed.length > 0 ? parsed : [{ desc: '', price: '', link: '' }];
     linkPreviews = {};
     renderItems();
     updateRemaining();

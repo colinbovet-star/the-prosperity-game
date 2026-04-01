@@ -502,6 +502,20 @@
       margin-bottom: 1rem;
       align-items: end;
     }
+    @media (max-width: 480px) {
+      .settings-reminder-row {
+        grid-template-columns: 1fr;
+      }
+      .settings-custom-row {
+        grid-template-columns: 1fr;
+      }
+      .settings-reminder-action {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .settings-reminder-action label { display: none; }
+    }
     .settings-reminder-action {
       display: flex;
       flex-direction: column;

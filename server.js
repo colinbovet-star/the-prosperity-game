@@ -102,12 +102,17 @@ app.post('/api/auth/request-link', async (req, res) => {
 
   if (!resend) return res.status(500).json({ error: 'Email not configured (missing RESEND_API_KEY)' });
   try {
-    await resend.emails.send({
+    const { data, error: sendError } = await resend.emails.send({
       from: `Prosperity Game <hello@the-prosperity-game.com>`,
       to:   email,
       subject: 'Your magic link to Prosperity Game ✨',
       html: buildMagicLinkEmail(token, email),
     });
+    if (sendError) {
+      console.error('Magic link send error:', sendError.message);
+      return res.status(500).json({ error: sendError.message });
+    }
+    console.log('Magic link sent, id:', data?.id);
     res.json({ ok: true });
   } catch (err) {
     console.error('Magic link send error:', err.message);

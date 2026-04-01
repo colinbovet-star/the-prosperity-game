@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const BASE_URL = (process.env.BASE_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-please-set-JWT_SECRET-in-env';
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // ---- Database ----
 const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, 'prosperity.db');
@@ -100,6 +100,7 @@ app.post('/api/auth/request-link', async (req, res) => {
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
   db.prepare('INSERT INTO magic_tokens (user_id, token, expires_at) VALUES (?, ?, ?)').run(user.id, token, expiresAt);
 
+  if (!resend) return res.status(500).json({ error: 'Email not configured (missing RESEND_API_KEY)' });
   try {
     await resend.emails.send({
       from: `Prosperity Game <hello@the-prosperity-game.com>`,
@@ -374,6 +375,7 @@ function buildReminderEmailHtml(dayNum, formatted) {
 }
 
 async function sendReminderEmail(to, dayNum, amount) {
+  if (!resend) throw new Error('Email not configured (missing RESEND_API_KEY)');
   const formatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
   const { data, error } = await resend.emails.send({
     from: 'Prosperity Game <hello@the-prosperity-game.com>',

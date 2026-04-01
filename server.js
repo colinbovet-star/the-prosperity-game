@@ -15,6 +15,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ---- Database ----
 const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, 'prosperity.db');
+const fs = require('fs');
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 let db;
 try {
   db = new Database(DB_PATH);

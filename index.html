@@ -2073,7 +2073,7 @@
     document.getElementById('s_start_date').value = settings.start_date;
     sCustomType = settings.custom_type || 'add';
     document.getElementById('s_custom_step').value = settings.custom_step || '';
-    document.getElementById('s_reminder_email').value = settings.reminder_email || '';
+    document.getElementById('s_reminder_email').value = settings.reminder_email || getEmail();
     document.getElementById('s_reminder_time').value = settings.reminder_time || '08:00';
     onSettingsModeChange();
     updateSettingsCustomTypeUI();

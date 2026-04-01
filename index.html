@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prosperity Game</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:       #c8952a;
+      --gold-dark:  #a07820;
+      --gold-light: #e8c060;
+      --cream:      #fdf8f0;
+      --cream-2:    #fff8ec;
+      --cream-3:    #fffbf5;
+      --border:     #e8d9b8;
+      --border-2:   #d4bc8e;
+      --text:       #2c2c2c;
+      --text-muted: #9a7840;
+      --text-dim:   #a07840;
+      --brown:      #7a5c1e;
+      --shadow-sm:  0 1px 4px rgba(120,80,0,0.08);
+      --shadow-md:  0 3px 12px rgba(120,80,0,0.12);
+      --shadow-lg:  0 6px 24px rgba(120,80,0,0.15);
+      --radius:     10px;
+      --radius-lg:  14px;
+    }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--cream);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(255,220,100,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, rgba(200,149,42,0.07) 0%, transparent 50%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2.5rem 1rem 4rem;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.1rem;
+      color: var(--brown);
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.01em;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-dim);
+      font-style: italic;
+      margin-bottom: 2rem;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--brown);
+      margin-bottom: 0.35rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    select, input[type="number"], input[type="date"], input[type="email"], input[type="time"] {
+      width: 100%;
+      padding: 0.55rem 0.8rem;
+      border: 1.5px solid var(--border-2);
+      border-radius: 7px;
+      background: #fffdf8;
+      font-size: 0.95rem;
+      color: var(--text);
+      font-family: inherit;
+      appearance: auto;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,149,42,0.15);
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 7px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      padding: 0.55rem 1.2rem;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    button:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #d4a030 0%, #b87820 100%);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(180,110,0,0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #c8952a 0%, #a87020 100%);
+      box-shadow: 0 3px 10px rgba(180,110,0,0.35);
+    }
+
+    .btn-ghost {
+      background: none;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+    }
+    .btn-ghost:hover { background: rgba(200,149,42,0.1); color: var(--brown); }
+
+    .btn-danger {
+      background: none;
+      color: #c0392b;
+      border: 1px solid #e8b0aa;
+      font-size: 0.82rem;
+      padding: 0.4rem 0.9rem;
+    }
+    .btn-danger:hover { background: #fff0ee; border-color: #c0392b; }
+
+    .saved-badge {
+      display: inline-block;
+      background: #d4edda;
+      color: #155724;
+      font-size: 0.78rem;
+      padding: 0.28rem 0.7rem;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .saved-badge.show { opacity: 1; }
+
+    /* ===================== ONBOARDING ===================== */
+    #onboarding { display: none; }
+
+    .onboarding-hero {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-top: 1rem;
+    }
+    .onboarding-hero .hero-icon {
+      font-size: 3rem;
+      line-height: 1;
+      margin-bottom: 1rem;
+      display: block;
+      filter: drop-shadow(0 2px 6px rgba(200,149,42,0.3));
+    }
+    .onboarding-hero h1 {
+      font-size: 2.6rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    .onboarding-hero p {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 1.05rem;
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    .mode-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 540px) {
+      .mode-cards { grid-template-columns: 1fr; }
+    }
+
+    .mode-card {
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, transform 0.15s;
+      user-select: none;
+      box-shadow: var(--shadow-sm);
+    }
+    .mode-card:hover {
+      border-color: var(--gold);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .mode-card.selected {
+      border-color: var(--gold);
+      background: linear-gradient(160deg, #fffcf2, #fff8e0);
+      box-shadow: 0 4px 16px rgba(200,149,42,0.22);
+    }
+    .mode-card .mc-icon { font-size: 2.2rem; margin-bottom: 0.6rem; display: block; }
+    .mode-card .mc-name {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: var(--brown);
+      margin-bottom: 0.4rem;
+    }
+    .mode-card .mc-desc {
+      font-size: 0.79rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .onboarding-config {
+      background: var(--cream-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem;
+      margin-bottom: 1.3rem;
+    }
+    @media (max-width: 480px) {
+      .config-grid { grid-template-columns: 1fr; }
+    }
+    .config-grid .span2 { grid-column: span 2; }
+    @media (max-width: 480px) {
+      .config-grid .span2 { grid-column: span 1; }
+    }
+
+    .custom-fields { display: none; }
+    .custom-fields.visible { display: contents; }
+
+    .custom-type-toggle {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.35rem;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 0.45rem;
+      border: 1.5px solid var(--border-2);
+      border-radius: 6px;
+      background: #fffdf7;
+      color: var(--brown);
+      font-size: 0.84rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+    .toggle-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+    }
+
+    .preview-box {
+      background: #fff;
+      border: 1px dashed var(--border-2);
+      border-radius: 8px;
+      padding: 0.95rem 1.1rem;
+      margin-bottom: 1.3rem;
+      font-size: 0.85rem;
+      color: var(--brown);
+      line-height: 1.8;
+    }
+    .preview-box strong { color: var(--text); }
+
+    .start-btn-wrap { text-align: center; }
+    .btn-start {
+      background: linear-gradient(135deg, #d4a030 0%, #b87820 100%);
+      color: #fff;
+      font-size: 1.15rem;
+      padding: 0.9rem 3rem;
+      border-radius: 9px;
+      font-family: Georgia, serif;
+      letter-spacing: 0.03em;
+      box-shadow: 0 4px 14px rgba(180,110,0,0.35);
+      transition: box-shadow 0.15s, transform 0.1s, background 0.15s;
+    }
+    .btn-start:hover {
+      background: linear-gradient(135deg, #c8952a 0%, #a87020 100%);
+      box-shadow: 0 6px 18px rgba(180,110,0,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* ===================== GAME VIEW ===================== */
+    #game { display: none; }
+
+    /* ---- Login screen ---- */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .login-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem 2.5rem 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+    .login-logo {
+      font-size: 2.8rem;
+      margin-bottom: 0.6rem;
+      line-height: 1;
+    }
+    .login-title {
+      font-size: 1.9rem;
+      color: var(--brown);
+      margin-bottom: 0.4rem;
+    }
+    .login-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+    .login-input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid var(--border-2);
+      border-radius: 8px;
+      background: #fffdf8;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .login-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,149,42,0.15);
+    }
+    .login-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #d4a030, #b87820);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(180,110,0,0.3);
+      transition: background 0.15s, box-shadow 0.15s;
+    }
+    .login-btn:hover {
+      background: linear-gradient(135deg, #c8952a, #a87020);
+      box-shadow: 0 4px 14px rgba(180,110,0,0.35);
+    }
+    .login-btn:disabled { opacity: 0.6; cursor: default; }
+    .login-sent-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .login-sent-text { font-size: 1rem; color: var(--brown); font-weight: bold; margin-bottom: 0.4rem; }
+    .login-sent-sub  { font-size: 0.85rem; color: var(--text-muted); }
+    .btn-link {
+      background: none; border: none; color: var(--gold-dark);
+      font-size: inherit; font-family: inherit; cursor: pointer;
+      text-decoration: underline; padding: 0;
+    }
+    .login-error {
+      color: #c0392b;
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+      min-height: 1.2em;
+    }
+    .login-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 1rem auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Game header + topbar ---- */
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+    }
+    .game-header h1 { margin-bottom: 0.15rem; font-size: 1.75rem; }
+    .game-header .subtitle { margin-bottom: 0; text-align: left; }
+    .game-header-left { flex: 1; }
+    .game-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.3rem;
+      padding-top: 0.2rem;
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
+    .topbar-email {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-signout {
+      background: none;
+      border: 1px solid var(--border-2);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-family: inherit;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-signout:hover { border-color: var(--gold); color: var(--brown); }
+
+    /* ---- Settings panel (in-game, animated) ---- */
+    .settings-panel {
+      background: var(--cream-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 2rem;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .settings-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 1rem 1.4rem;
+      user-select: none;
+    }
+    .settings-panel-header h2 { font-size: 0.95rem; color: var(--brown); }
+    .settings-panel-header .chevron {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      transition: transform 0.25s;
+    }
+    .settings-panel.open .chevron { transform: rotate(180deg); }
+    .settings-panel-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 1.4rem;
+    }
+    .settings-panel.open .settings-panel-body {
+      max-height: 800px;
+      padding: 0 1.4rem 1.25rem;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .settings-custom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .settings-reminder-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: end;
+    }
+    .settings-reminder-action {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .settings-reminder-action label { margin-bottom: 0.35rem; }
+    .btn-secondary {
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      color: var(--brown);
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { background: rgba(200,149,42,0.08); }
+    .settings-danger {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .settings-danger p { font-size: 0.78rem; color: #aaa; }
+
+    /* ---- Stats bar ---- */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 480px) {
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .stats-bar .stat-total { grid-column: span 2; }
+    }
+    .stat-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+    .stat-item:hover { box-shadow: var(--shadow-md); }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 0.35rem;
+    }
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: bold;
+      color: var(--brown);
+      line-height: 1.1;
+    }
+    .stat-value.large { font-size: 1.7rem; }
+
+    /* ---- Future notice card ---- */
+    .future-card {
+      text-align: center;
+      background: linear-gradient(160deg, #fffcf5, #fff8e8);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .future-card .fc-icon { font-size: 2.5rem; display: block; margin-bottom: 1rem; }
+    .future-card h3 { font-size: 1.3rem; color: var(--brown); margin-bottom: 0.5rem; }
+    .future-card p { color: var(--text-muted); font-style: italic; font-size: 0.95rem; line-height: 1.6; }
+    .future-card .fc-date {
+      display: inline-block;
+      margin-top: 0.75rem;
+      background: var(--cream-2);
+      border: 1px solid var(--border-2);
+      border-radius: 6px;
+      padding: 0.4rem 1rem;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: var(--brown);
+    }
+
+    /* ---- Today card ---- */
+    .today-card {
+      background: linear-gradient(150deg, #fffcf2 0%, #fff5d0 60%, #ffedb0 100%);
+      border: 1.5px solid #e0c87a;
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.75rem 1.6rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(200,149,42,0.14);
+      position: relative;
+      overflow: hidden;
+    }
+    .today-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 150px; height: 150px;
+      background: radial-gradient(circle, rgba(255,220,100,0.25), transparent 70%);
+      pointer-events: none;
+    }
+    .today-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.4rem;
+    }
+    .today-deposit-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .today-amount {
+      font-size: 3.4rem;
+      font-weight: bold;
+      color: var(--brown);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      text-shadow: 0 1px 3px rgba(120,80,0,0.12);
+    }
+    @media (max-width: 420px) { .today-amount { font-size: 2.6rem; } }
+    .today-meta {
+      text-align: right;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+    .today-meta strong { display: block; font-size: 1rem; color: var(--brown); }
+    .today-divider {
+      border: none;
+      border-top: 1px solid rgba(200,149,42,0.25);
+      margin: 0 0 1.2rem;
+    }
+    .today-prompt {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 0.6rem;
+    }
+    /* ---- Inspiration section ---- */
+    .inspiration-section {
+      margin-bottom: 1.1rem;
+    }
+    .inspiration-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: var(--gold-dark);
+      font-size: 0.8rem;
+      font-style: italic;
+      font-family: Georgia, serif;
+      margin-bottom: 0.6rem;
+      opacity: 0.8;
+    }
+    .inspiration-toggle:hover { opacity: 1; }
+    .inspiration-toggle .toggle-arrow {
+      font-size: 0.65rem;
+      transition: transform 0.2s;
+      font-style: normal;
+    }
+    .inspiration-toggle.open .toggle-arrow { transform: rotate(90deg); }
+    .inspiration-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.5rem;
+    }
+    .inspo-card {
+      background: rgba(255,255,255,0.7);
+      border: 1.5px solid rgba(200,149,42,0.22);
+      border-radius: 10px;
+      padding: 0.7rem 0.65rem 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      cursor: default;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .inspo-card:hover {
+      border-color: rgba(200,149,42,0.5);
+      box-shadow: 0 2px 8px rgba(180,130,30,0.1);
+    }
+    .inspo-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .inspo-title {
+      font-size: 0.78rem;
+      font-weight: bold;
+      color: var(--brown);
+      line-height: 1.25;
+    }
+    .inspo-desc {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    /* ---- Spending items ---- */
+    #items-container { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .item-card {
+      background: rgba(255,255,255,0.75);
+      border: 1.5px solid rgba(200,149,42,0.3);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem 0.7rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      column-gap: 0.5rem;
+      row-gap: 0.45rem;
+      align-items: start;
+    }
+    .item-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      min-width: 0;
+    }
+    .desc-field-wrap {
+      position: relative;
+      border: 1.5px solid var(--border-2);
+      border-radius: 6px;
+      background: #fffdf8;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .desc-field-wrap:focus-within {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(200,149,42,0.15);
+    }
+    .item-desc-input {
+      width: 100%;
+      padding: 0.5rem 0.65rem;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      font-size: 0.92rem;
+      font-family: Georgia, serif;
+      color: var(--text);
+      resize: vertical;
+      line-height: 1.5;
+      display: block;
+    }
+    .item-desc-input:focus { outline: none; }
+    .item-price-wrap {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .price-currency {
+      padding: 0 0.1rem 0 0.7rem;
+      font-size: 0.95rem;
+      color: var(--brown);
+      font-weight: bold;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .item-price-input {
+      flex: 1;
+      padding: 0.38rem 0.6rem 0.38rem 0.3rem;
+      border: 1.5px solid var(--border-2);
+      border-radius: 6px;
+      background: #fffdf8;
+      font-size: 0.92rem;
+      font-family: inherit;
+      color: var(--text);
+      min-width: 0;
+    }
+    .item-price-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(200,149,42,0.15);
+    }
+    .desc-hint {
+      font-size: 0.75rem;
+      color: var(--gold-dark);
+      font-style: italic;
+      padding: 0 0.65rem 0.45rem;
+      display: none;
+    }
+    .desc-hint.show { display: block; }
+    .item-remove {
+      background: none;
+      border: none;
+      color: #c0a060;
+      font-size: 1.2rem;
+      line-height: 1;
+      padding: 0.15rem 0.25rem;
+      cursor: pointer;
+      border-radius: 4px;
+      align-self: start;
+      margin-top: 0.4rem;
+      transition: color 0.15s;
+    }
+    .item-remove:hover { color: #c0392b; }
+    .item-link-input {
+      width: 100%;
+      padding: 0.35rem 0.6rem;
+      border: 1.5px solid var(--border-2);
+      border-radius: 6px;
+      background: #fffdf8;
+      font-size: 0.84rem;
+      font-family: inherit;
+      color: var(--text);
+    }
+    .item-link-input:focus {
+      outline: none; border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(200,149,42,0.15);
+    }
+    /* Link preview card */
+    .link-preview-loading { font-size: 0.78rem; color: #b09060; font-style: italic; padding: 0.25rem 0; }
+    .link-preview-card {
+      display: block;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #ddd0a8;
+      background: #fdfaf3;
+      box-shadow: 0 3px 14px rgba(120,80,0,0.12);
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.2s, transform 0.15s;
+      margin-top: 0.1rem;
+    }
+    .link-preview-card:hover { box-shadow: 0 5px 20px rgba(120,80,0,0.2); transform: translateY(-1px); }
+    /* Hero image area */
+    .lp-hero {
+      position: relative;
+      width: 100%;
+      height: 175px;
+      background: linear-gradient(135deg, #e8d9b8 0%, #c8a860 100%);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .lp-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .lp-hero-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 2rem 1rem 0.85rem;
+      background: linear-gradient(to top, rgba(20,10,0,0.78) 0%, rgba(20,10,0,0.1) 70%, transparent 100%);
+    }
+    .lp-hero .lp-site {
+      font-size: 0.63rem;
+      color: rgba(255,220,140,0.85);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.2rem;
+    }
+    .lp-hero .lp-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      line-height: 1.3;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+    /* No-image fallback header */
+    .lp-text-header {
+      background: linear-gradient(135deg, #3a2800 0%, #6b4a10 100%);
+      padding: 1rem 1.1rem 0.9rem;
+    }
+    .lp-text-header .lp-site {
+      font-size: 0.63rem;
+      color: rgba(255,210,120,0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+    .lp-text-header .lp-title {
+      font-size: 0.97rem;
+      font-weight: bold;
+      color: #fff;
+      line-height: 1.35;
+    }
+    /* Body / description */
+    .lp-body {
+      padding: 0.65rem 1rem 0.7rem;
+      border-top: 1px solid #ede0c0;
+    }
+    .lp-desc {
+      font-size: 0.79rem;
+      color: #5a4a2a;
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .lp-link-hint {
+      font-size: 0.68rem;
+      color: #a07840;
+      margin-top: 0.35rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Remaining balance */
+    .today-remaining {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+    }
+    .today-remaining .rem-amount { font-weight: bold; color: var(--brown); }
+    .today-remaining .rem-amount.over { color: #c0392b; }
+    .prosperity-quote {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--brown);
+      text-align: center;
+      line-height: 1.6;
+      padding: 0.7rem 0.5rem 0.1rem;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      min-height: 0;
+    }
+    .prosperity-quote.show { opacity: 1; }
+
+    .btn-add-item {
+      background: none;
+      color: var(--gold-dark);
+      border: 1.5px dashed rgba(200,149,42,0.45);
+      border-radius: 7px;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.9rem;
+      width: 100%;
+      margin-bottom: 0.8rem;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-add-item:hover { background: rgba(200,149,42,0.07); border-color: var(--gold); }
+    /* ---- History item cards ---- */
+    .hi-items { display: flex; flex-direction: column; gap: 0.25rem; }
+    .hi-item {
+      font-size: 0.85rem;
+      color: #444;
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .hi-item-desc { font-weight: bold; color: var(--brown); }
+    .hi-item-price { color: #2d7a4a; font-size: 0.82rem; white-space: nowrap; }
+    .hi-item-link { font-size: 0.78rem; color: var(--gold-dark); text-decoration: none; }
+    .hi-item-link:hover { text-decoration: underline; }
+    .today-actions {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .entry-status {
+      font-size: 0.8rem;
+      color: #999;
+      font-style: italic;
+    }
+    .entry-status.has-entry { color: #2d7a4a; }
+
+    /* ---- History ---- */
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .history-header h2 { font-size: 1.1rem; color: #7a5c1e; }
+    .history-header .toggle-btn { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
+    .history-list { display: flex; flex-direction: column; gap: 1.1rem; }
+
+    /* ---- Day Cards ---- */
+    .day-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      background: #fff;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .day-card.clickable { cursor: pointer; }
+    .day-card.clickable:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+    .day-card.skipped {
+      background: #fafaf8;
+      border-color: #ede8de;
+      box-shadow: none;
+    }
+    /* Hero image */
+    .dc-hero {
+      position: relative;
+      width: 100%;
+      height: 210px;
+      background: linear-gradient(135deg, #e8d9b8 0%, #c8a860 100%);
+      overflow: hidden;
+    }
+    .dc-hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .dc-hero-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 2.5rem 1.3rem 1.1rem;
+      background: linear-gradient(to top, rgba(15,8,0,0.78) 0%, transparent 100%);
+    }
+    .dc-hero .dc-day-label {
+      font-size: 0.63rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,210,120,0.85);
+      margin-bottom: 0.2rem;
+    }
+    .dc-hero .dc-date {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.45);
+    }
+    /* Text-only header (no hero image) */
+    .dc-header {
+      background: linear-gradient(135deg, #fffcf2 0%, #fff5d0 60%, #ffedb0 100%);
+      border-bottom: 1px solid rgba(200,149,42,0.22);
+      padding: 1rem 1.3rem 0.9rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+    .dc-header .dc-day-label {
+      font-size: 0.63rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .dc-header .dc-date {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: var(--brown);
+    }
+    .dc-today-badge {
+      background: var(--gold);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.18rem 0.55rem;
+      border-radius: 20px;
+      margin-left: auto;
+      align-self: center;
+    }
+    /* Card body */
+    .dc-body { padding: 1rem 1.3rem 1.2rem; }
+    /* Items */
+    .dc-items { display: flex; flex-direction: column; }
+    .dc-item {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid rgba(200,149,42,0.1);
+    }
+    .dc-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .dc-item:first-child { padding-top: 0; }
+    .dc-item-desc {
+      font-size: 0.94rem;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 0.3rem;
+    }
+    .dc-item-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 1.2rem;
+    }
+    .dc-item-link {
+      font-size: 0.71rem;
+      color: var(--gold-dark);
+      text-decoration: none;
+    }
+    .dc-item-link:hover { text-decoration: underline; }
+    .dc-item-price {
+      font-size: 0.92rem;
+      font-weight: bold;
+      color: #2d7a4a;
+      white-space: nowrap;
+      margin-left: auto;
+    }
+    /* Total */
+    .dc-total {
+      margin-top: 0.9rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(200,149,42,0.15);
+      text-align: right;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    .dc-total strong {
+      font-size: 1.15rem;
+      color: #2d7a4a;
+      letter-spacing: normal;
+      text-transform: none;
+      margin-left: 0.4rem;
+    }
+    /* Pending / skipped */
+    .dc-pending { font-size: 0.88rem; color: #b09060; font-style: italic; }
+    .dc-skipped { padding: 0.65rem 1.1rem; font-size: 0.81rem; color: #c0b090; font-style: italic; }
+
+    /* Summary footer */
+    .history-stats-row {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0.85rem 1.1rem;
+      background: #fff8ec;
+      border: 1px solid #e8d9b8;
+      border-radius: 8px;
+      margin-top: 0.25rem;
+      flex-wrap: wrap;
+    }
+    .history-stats-row .hs-item { flex: 1; min-width: 100px; }
+    .history-stats-row .hs-label { font-size: 0.72rem; color: #a07840; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem; }
+    .history-stats-row .hs-value { font-size: 1.05rem; font-weight: bold; color: #7a5c1e; }
+
+    .empty-state { text-align: center; color: #aaa; font-style: italic; padding: 1.5rem; }
+
+    /* ---- Transitions ---- */
+    .fade-in { animation: fadeIn 0.45s ease both; }
+    .slide-up { animation: slideUp 0.4s ease both; }
+    @keyframes fadeIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+    /* ---- Responsive tweaks ---- */
+    @media (max-width: 420px) {
+      body { padding: 1.5rem 0.75rem 3rem; }
+      .today-card { padding: 1.5rem 1.2rem 1.3rem; }
+      .dc-hero { height: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="login-screen" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">✨</div>
+    <h1 class="login-title">Prosperity Game</h1>
+    <p class="login-subtitle">Your daily practice in abundance thinking</p>
+
+    <div id="login-form">
+      <input type="email" id="login-email" class="login-input" placeholder="your@email.com"
+        onkeydown="if(event.key==='Enter') requestMagicLink()">
+      <button class="login-btn" id="login-btn" onclick="requestMagicLink()">Send me a magic link ✨</button>
+      <div class="login-error" id="login-error"></div>
+    </div>
+
+    <div id="login-sent" style="display:none">
+      <div class="login-sent-icon">✉️</div>
+      <p class="login-sent-text">Check your inbox!</p>
+      <p class="login-sent-sub">Your magic link is on its way. It expires in 15 minutes.</p>
+      <p class="login-sent-sub" style="margin-top:0.5rem">
+        Wrong address? <button class="btn-link" onclick="showLoginForm()">Try again</button>
+      </p>
+    </div>
+
+    <div id="login-verifying" style="display:none">
+      <div class="login-spinner"></div>
+      <p style="color:var(--text-muted);font-size:0.9rem">Signing you in…</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ONBOARDING ===================== -->
+<div id="onboarding" class="container">
+  <div class="onboarding-hero">
+    <span class="hero-icon">✨</span>
+    <h1>Prosperity Game</h1>
+    <p>Each day, you receive a growing sum of imaginary money to spend joyfully — in your mind.</p>
+  </div>
+
+  <!-- Mode cards -->
+  <div class="mode-cards">
+    <div class="mode-card" data-mode="linear" onclick="selectMode('linear')">
+      <div class="mc-icon">📈</div>
+      <div class="mc-name">Linear</div>
+      <div class="mc-desc">Add the same amount every day<br><em>Day 1: $1k &rarr; Day 2: $2k &rarr; Day 3: $3k</em></div>
+    </div>
+    <div class="mode-card selected" data-mode="doubling" onclick="selectMode('doubling')">
+      <div class="mc-icon">✨</div>
+      <div class="mc-name">Doubling</div>
+      <div class="mc-desc">Double your money every day<br><em>Day 1: $1k &rarr; Day 2: $2k &rarr; Day 3: $4k</em></div>
+    </div>
+    <div class="mode-card" data-mode="custom" onclick="selectMode('custom')">
+      <div class="mc-icon">🎛️</div>
+      <div class="mc-name">Custom</div>
+      <div class="mc-desc">Set your own starting amount and daily step or multiplier</div>
+    </div>
+  </div>
+
+  <!-- Config fields -->
+  <div class="onboarding-config">
+    <div class="config-grid">
+      <!-- Standard: start amount -->
+      <div id="ob-start-amount-wrap">
+        <label for="ob_start_amount">Starting Amount (Day 1)</label>
+        <input type="number" id="ob_start_amount" min="1" step="1" value="1000"
+               oninput="updatePreview()" />
+      </div>
+
+      <!-- Start date -->
+      <div>
+        <label for="ob_start_date">Start Date</label>
+        <input type="date" id="ob_start_date" oninput="updatePreview()" />
+      </div>
+
+      <!-- Custom fields (hidden unless custom mode) -->
+      <div class="custom-fields" id="ob-custom-fields">
+        <div>
+          <label>Daily Step Type</label>
+          <div class="custom-type-toggle">
+            <button class="toggle-btn active" id="tog-add" onclick="setCustomType('add')">+ Add</button>
+            <button class="toggle-btn" id="tog-multiply" onclick="setCustomType('multiply')">× Multiply</button>
+          </div>
+        </div>
+        <div>
+          <label for="ob_custom_step" id="ob-custom-step-label">Daily Increment ($)</label>
+          <input type="number" id="ob_custom_step" min="0.01" step="1" value="1000"
+                 oninput="updatePreview()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-box" id="ob-preview"></div>
+
+    <div class="start-btn-wrap">
+      <button class="btn-start" onclick="startGame()">Start My Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== GAME VIEW ===================== -->
+<div id="game" class="container">
+  <div class="game-header">
+    <div class="game-header-left">
+      <h1>Prosperity Game</h1>
+      <p class="subtitle">Your daily practice in abundance thinking — where big dreams get a budget. Each day the Universe deposits a little more into your account. Spend it all with joy.</p>
+    </div>
+    <div class="game-header-right">
+      <span class="topbar-email" id="topbar-email"></span>
+      <button class="btn-signout" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Settings panel (collapsible, animated) -->
+  <div class="settings-panel" id="settings-panel">
+    <div class="settings-panel-header" onclick="toggleSettings()">
+      <h2>⚙ Settings</h2>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="settings-panel-body">
+      <div class="settings-grid">
+        <div>
+          <label for="s_game_mode">Mode</label>
+          <select id="s_game_mode" onchange="onSettingsModeChange()">
+            <option value="doubling">Doubling (×2/day)</option>
+            <option value="linear">Linear (+start/day)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div>
+          <label for="s_start_amount">Day 1 Amount ($)</label>
+          <input type="number" id="s_start_amount" min="1" step="1" />
+        </div>
+        <div>
+          <label for="s_start_date">Start Date</label>
+          <input type="date" id="s_start_date" />
+        </div>
+      </div>
+      <div class="settings-custom-row" id="s-custom-row" style="display:none">
+        <div>
+          <label>Daily Step Type</label>
+          <div class="custom-type-toggle">
+            <button class="toggle-btn active" id="s-tog-add" onclick="setSettingsCustomType('add')">+ Add</button>
+            <button class="toggle-btn" id="s-tog-multiply" onclick="setSettingsCustomType('multiply')">× Multiply</button>
+          </div>
+        </div>
+        <div>
+          <label for="s_custom_step" id="s-custom-step-label">Daily Increment ($)</label>
+          <input type="number" id="s_custom_step" min="0.01" step="1" />
+        </div>
+      </div>
+      <!-- Email reminder row -->
+      <div class="settings-reminder-row">
+        <div>
+          <label for="s_reminder_email">Daily Reminder Email</label>
+          <input type="email" id="s_reminder_email" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label for="s_reminder_time">Reminder Time</label>
+          <input type="time" id="s_reminder_time" value="08:00" />
+        </div>
+        <div class="settings-reminder-action">
+          <label>&nbsp;</label>
+          <button class="btn-secondary" onclick="sendTestEmail()">Send Test Email</button>
+          <span id="test-email-status" class="saved-badge"></span>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+      <span id="settings-saved" class="saved-badge">Saved!</span>
+      <div class="settings-danger">
+        <button class="btn-danger" onclick="confirmReset()">Reset Game</button>
+        <p>Clears all data and returns to setup</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-bar" id="stats-bar" style="display:none">
+    <div class="stat-item">
+      <div class="stat-label">Day</div>
+      <div class="stat-value large" id="stat-day">—</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Today's Deposit</div>
+      <div class="stat-value" id="stat-today">—</div>
+    </div>
+    <div class="stat-item stat-total">
+      <div class="stat-label">Total Received</div>
+      <div class="stat-value" id="stat-total">—</div>
+    </div>
+  </div>
+
+  <!-- Today -->
+  <div id="today-section" class="today-card" style="display:none">
+    <div class="today-card-header">
+      <div>
+        <div class="today-deposit-label">Today's Deposit</div>
+        <div class="today-amount" id="today-amount-display"></div>
+        <div class="today-remaining" id="today-remaining" style="display:none"></div>
+      </div>
+      <div class="today-meta">
+        <strong id="today-date-display"></strong>
+        <span id="today-day-label"></span>
+      </div>
+    </div>
+    <hr class="today-divider" />
+
+    <!-- Inspiration section -->
+    <div class="inspiration-section">
+      <button class="inspiration-toggle open" onclick="toggleInspiration(this)">
+        <span class="toggle-arrow">▶</span> What can you spend this on?
+      </button>
+      <div class="inspiration-cards">
+        <div class="inspo-card">
+          <div class="inspo-icon">💎</div>
+          <div class="inspo-title">Luxuries &amp; Upgrades</div>
+          <div class="inspo-desc">Silk sheets, fine jewelry, high-end skincare — things that feel exquisite.</div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-icon">✈️</div>
+          <div class="inspo-title">Experiences &amp; Travel</div>
+          <div class="inspo-desc">Vacations, spa retreats, dream concerts, or classes you've always wanted.</div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-icon">🏡</div>
+          <div class="inspo-title">Upgrade Daily Life</div>
+          <div class="inspo-desc">New car, home remodel, private chef, personal trainer — elevate the everyday.</div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-icon">🎁</div>
+          <div class="inspo-title">Generosity</div>
+          <div class="inspo-desc">Spend on people or causes you love — generosity flows the energy forward.</div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-icon">🌱</div>
+          <div class="inspo-title">Go General First</div>
+          <div class="inspo-desc">If details bring resistance, stay broad: "a luxury car." Get specific as you grow comfortable.</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="today-prompt">This money is yours — spend it with joy. What will you do, feel, and experience?</p>
+    <div id="items-container"></div>
+    <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
+    <div class="today-actions">
+      <button class="btn-primary" onclick="saveToday()">Save Entry</button>
+      <span id="today-saved" class="saved-badge">Saved!</span>
+      <span class="entry-status" id="entry-status"></span>
+    </div>
+    <div id="prosperity-quote" class="prosperity-quote"></div>
+  </div>
+
+  <div id="future-notice" style="display:none">
+    <div class="future-card">
+      <span class="fc-icon">🌱</span>
+      <h3>Your game hasn't started yet</h3>
+      <p>Come back on your start date and your first deposit will be waiting for you.</p>
+      <div class="fc-date" id="future-date"></div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div id="history-section" style="display:none">
+    <div class="history-header">
+      <h2>All Days</h2>
+      <div style="display:flex;gap:0.4rem;align-items:center;">
+        <button class="toggle-btn active" id="filter-all"    onclick="setFilter('all')">All</button>
+        <button class="toggle-btn"        id="filter-saved"  onclick="setFilter('saved')">Journaled</button>
+        <button class="toggle-btn"        id="filter-missed" onclick="setFilter('missed')">Missed</button>
+      </div>
+    </div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+</div>
+
+<script>
+  // ---- State ----
+  let settings = null;
+  let entries = {};
+  let todayDayNumber = null;
+  let obMode = 'doubling';
+  let obCustomType = 'add';
+  let sCustomType = 'add';
+  let historyFilter = 'all';
+  let todayItems = []; // [{ desc, price, link }]
+  let linkPreviews = {}; // idx -> preview object | 'loading' | null
+
+  // ---- Auth helpers ----
+  function getJwt()   { return localStorage.getItem('pg_jwt'); }
+  function getEmail() { return localStorage.getItem('pg_email') || ''; }
+
+  function authFetch(url, options = {}) {
+    const token = getJwt();
+    const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return fetch(url, { ...options, headers });
+  }
+
+  function showLoginScreen() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('onboarding').style.display   = 'none';
+    document.getElementById('game').style.display         = 'none';
+  }
+
+  function showLoginForm() {
+    document.getElementById('login-form').style.display     = 'block';
+    document.getElementById('login-sent').style.display     = 'none';
+    document.getElementById('login-verifying').style.display = 'none';
+    document.getElementById('login-error').textContent      = '';
+    document.getElementById('login-email').value            = '';
+  }
+
+  async function requestMagicLink() {
+    const email = document.getElementById('login-email').value.trim();
+    if (!email || !email.includes('@')) {
+      document.getElementById('login-error').textContent = 'Please enter a valid email address.';
+      return;
+    }
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    document.getElementById('login-error').textContent = '';
+    try {
+      const r    = await fetch('/api/auth/request-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Something went wrong');
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('login-sent').style.display = 'block';
+    } catch (err) {
+      document.getElementById('login-error').textContent = err.message;
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'Send me a magic link ✨';
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('pg_jwt');
+    localStorage.removeItem('pg_email');
+    settings = null; entries = {}; todayDayNumber = null;
+    historyFilter = 'all'; todayItems = []; linkPreviews = {};
+    showLoginScreen();
+    showLoginForm();
+  }
+
+  // ---- Init ----
+  async function init() {
+    // Check for magic link token in URL
+    const params     = new URLSearchParams(window.location.search);
+    const magicToken = params.get('token');
+
+    if (magicToken) {
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('login-form').style.display     = 'none';
+      document.getElementById('login-verifying').style.display = 'block';
+      window.history.replaceState({}, '', '/');
+      try {
+        const r    = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: magicToken })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Verification failed');
+        localStorage.setItem('pg_jwt',   data.jwt);
+        localStorage.setItem('pg_email', data.email);
+        await loadApp();
+      } catch (err) {
+        document.getElementById('login-verifying').style.display = 'none';
+        document.getElementById('login-form').style.display      = 'block';
+        document.getElementById('login-error').textContent       = err.message;
+      }
+      return;
+    }
+
+    if (!getJwt()) { showLoginScreen(); return; }
+
+    // Validate stored JWT with server
+    try {
+      const r = await authFetch('/api/auth/me');
+      if (r.status === 401) { logout(); return; }
+    } catch (_) { showLoginScreen(); return; }
+
+    await loadApp();
+  }
+
+  async function loadApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('topbar-email').textContent   = getEmail();
+    document.getElementById('ob_start_date').value        = todayISO();
+
+    const [s, e] = await Promise.all([
+      authFetch('/api/settings').then(r => r.ok ? r.json() : null),
+      authFetch('/api/entries').then(r => r.ok ? r.json() : [])
+    ]);
+
+    entries = {};
+    for (const entry of (e || [])) entries[entry.day_number] = entry;
+
+    if (s) { settings = s; showGame(); }
+    else   { showOnboarding(); }
+  }
+
+  // ---- Screen transitions ----
+  function showOnboarding() {
+    document.getElementById('onboarding').style.display = 'block';
+    document.getElementById('game').style.display = 'none';
+    updatePreview();
+  }
+
+  function showGame() {
+    document.getElementById('onboarding').style.display = 'none';
+    const game = document.getElementById('game');
+    game.style.display = 'block';
+    game.classList.add('fade-in');
+    populateSettingsPanel();
+    render();
+  }
+
+  // ---- Helpers ----
+  function todayISO() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function daysBetween(isoA, isoB) {
+    const a = new Date(isoA + 'T00:00:00');
+    const b = new Date(isoB + 'T00:00:00');
+    return Math.floor((b - a) / 86400000);
+  }
+
+  function amountForDay(dayNum, s) {
+    s = s || settings;
+    if (!s) return 0;
+    const start = Number(s.start_amount);
+    if (s.game_mode === 'doubling') {
+      return start * Math.pow(2, dayNum - 1);
+    } else if (s.game_mode === 'linear') {
+      // Day 1 = start, each subsequent day adds start as the increment
+      return start + (dayNum - 1) * start;
+    } else {
+      // custom
+      const step = Number(s.custom_step) || start;
+      if (s.custom_type === 'multiply') {
+        return start * Math.pow(step, dayNum - 1);
+      } else {
+        return start + (dayNum - 1) * step;
+      }
+    }
+  }
+
+  function runningTotal(upToDay) {
+    let total = 0;
+    for (let d = 1; d <= upToDay; d++) total += amountForDay(d);
+    return total;
+  }
+
+  function formatMoney(n) {
+    if (!isFinite(n) || isNaN(n)) return '$∞';
+    if (n >= 1e15) return '$' + (n / 1e15).toLocaleString(undefined, { maximumFractionDigits: 2 }) + 'Q';
+    if (n >= 1e12) return '$' + (n / 1e12).toLocaleString(undefined, { maximumFractionDigits: 2 }) + 'T';
+    if (n >= 1e9)  return '$' + (n / 1e9).toLocaleString(undefined,  { maximumFractionDigits: 2 }) + 'B';
+    if (n >= 1e6)  return '$' + (n / 1e6).toLocaleString(undefined,  { maximumFractionDigits: 2 }) + 'M';
+    return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function decodeHtmlEntities(s) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = s;
+    return txt.value;
+  }
+
+  // Returns the calendar date (ISO string) for a given 1-based day number
+  function dayToDate(dayNum) {
+    const base = new Date(settings.start_date + 'T00:00:00');
+    base.setDate(base.getDate() + dayNum - 1);
+    return base.toISOString().slice(0, 10);
+  }
+
+  function formatDateShort(iso) {
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  // ---- Onboarding logic ----
+  function selectMode(mode) {
+    obMode = mode;
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+    document.querySelector(`.mode-card[data-mode="${mode}"]`).classList.add('selected');
+
+    const customFields = document.getElementById('ob-custom-fields');
+    customFields.classList.toggle('visible', mode === 'custom');
+
+    // Hide start amount label tweak for doubling/linear
+    document.getElementById('ob-start-amount-wrap').querySelector('label').textContent =
+      mode === 'linear' ? 'Daily Increment (= Day 1 amount)' : 'Starting Amount (Day 1)';
+
+    updatePreview();
+  }
+
+  function setCustomType(type) {
+    obCustomType = type;
+    document.getElementById('tog-add').classList.toggle('active', type === 'add');
+    document.getElementById('tog-multiply').classList.toggle('active', type === 'multiply');
+    document.getElementById('ob-custom-step-label').textContent =
+      type === 'add' ? 'Daily Increment ($)' : 'Daily Multiplier (e.g. 2 = double)';
+    const stepInput = document.getElementById('ob_custom_step');
+    if (type === 'multiply') { stepInput.step = '0.1'; stepInput.value = stepInput.value < 1.1 ? '2' : stepInput.value; }
+    else { stepInput.step = '1'; }
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const start = Number(document.getElementById('ob_start_amount').value) || 1000;
+    const step = Number(document.getElementById('ob_custom_step').value) || 1000;
+    const preview = document.getElementById('ob-preview');
+
+    const mock = { game_mode: obMode, start_amount: start, custom_type: obCustomType, custom_step: step };
+    const days = [1, 2, 3, 5, 10];
+    const parts = days.map(d => `Day ${d}: <strong>${formatMoney(amountForDay(d, mock))}</strong>`);
+    preview.innerHTML = parts.join(' &nbsp;·&nbsp; ') + ' &nbsp;·&nbsp; <em>...</em>';
+  }
+
+  async function startGame() {
+    const start_amount = Number(document.getElementById('ob_start_amount').value);
+    const start_date   = document.getElementById('ob_start_date').value;
+    const custom_step  = Number(document.getElementById('ob_custom_step').value) || null;
+
+    if (!start_date) { alert('Please pick a start date.'); return; }
+    if (!start_amount || start_amount < 1) { alert('Please enter a valid starting amount.'); return; }
+
+    const payload = {
+      game_mode: obMode,
+      start_amount,
+      start_date,
+      custom_type: obCustomType,
+      custom_step: obMode === 'custom' ? custom_step : null
+    };
+
+    await authFetch('/api/settings', { method: 'POST', body: JSON.stringify(payload) });
+
+    settings = payload;
+    showGame();
+  }
+
+  // ---- Game render ----
+  function render() {
+    const diff = daysBetween(settings.start_date, todayISO());
+    todayDayNumber = diff + 1;
+
+    const futureNotice = document.getElementById('future-notice');
+    const statsBar = document.getElementById('stats-bar');
+
+    if (todayDayNumber < 1) {
+      statsBar.style.display = 'none';
+      document.getElementById('today-section').style.display = 'none';
+      document.getElementById('history-section').style.display = 'none';
+      futureNotice.style.display = 'block';
+      const startObj = new Date(settings.start_date + 'T00:00:00');
+      document.getElementById('future-date').textContent =
+        startObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      return;
+    }
+
+    futureNotice.style.display = 'none';
+
+    const todayAmount = amountForDay(todayDayNumber);
+    const total = runningTotal(todayDayNumber);
+
+    // Stats bar
+    statsBar.style.display = 'grid';
+    statsBar.classList.add('slide-up');
+    document.getElementById('stat-day').textContent = todayDayNumber;
+    document.getElementById('stat-today').textContent = formatMoney(todayAmount);
+    document.getElementById('stat-total').textContent = formatMoney(total);
+
+    // Today card
+    const todaySection = document.getElementById('today-section');
+    todaySection.style.display = 'block';
+    todaySection.classList.add('slide-up');
+    document.getElementById('today-amount-display').textContent = formatMoney(todayAmount);
+
+    const dateObj = new Date(todayISO() + 'T00:00:00');
+    document.getElementById('today-date-display').textContent =
+      dateObj.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+    document.getElementById('today-day-label').textContent = 'Day ' + todayDayNumber;
+
+    const todayEntry = entries[todayDayNumber];
+    todayItems = todayEntry ? parseItems(todayEntry) : [];
+    linkPreviews = {};
+    renderItems();
+    updateRemaining();
+    updateEntryStatus();
+    todayItems.forEach((item, i) => { if (item.link) fetchItemPreview(i); });
+
+    document.getElementById('history-section').style.display = 'block';
+    renderHistory();
+  }
+
+  function updateEntryStatus() {
+    const el = document.getElementById('entry-status');
+    const entry = entries[todayDayNumber];
+    const items = entry ? parseItems(entry) : [];
+    if (items.length > 0) {
+      el.textContent = items.length + ' item' + (items.length > 1 ? 's' : '') + ' saved';
+      el.className = 'entry-status has-entry';
+    } else {
+      el.textContent = 'No entry yet';
+      el.className = 'entry-status';
+    }
+  }
+
+  // ---- Items helpers ----
+  function parseItems(entry) {
+    try {
+      const arr = JSON.parse(entry.spending_items || '[]');
+      return Array.isArray(arr) ? arr : [];
+    } catch (_) { return []; }
+  }
+
+  function addItem() {
+    todayItems.push({ desc: '', price: '', link: '' });
+    renderItems();
+    const rows = document.querySelectorAll('.item-card');
+    if (rows.length) rows[rows.length - 1].querySelector('.item-desc-input').focus();
+  }
+
+  function removeItem(idx) {
+    todayItems.splice(idx, 1);
+    const shifted = {};
+    Object.entries(linkPreviews).forEach(([k, v]) => {
+      const ki = parseInt(k);
+      if (ki < idx) shifted[ki] = v;
+      else if (ki > idx) shifted[ki - 1] = v;
+    });
+    linkPreviews = shifted;
+    renderItems();
+    updateRemaining();
+  }
+
+  function collectItems() {
+    return Array.from(document.querySelectorAll('.item-card')).map((card, i) => {
+      const p = linkPreviews[i];
+      const preview = (p && p !== 'loading' && p.title) ? { image: p.image || '', title: p.title || '', site: p.siteName || '' } : null;
+      return {
+        desc:  card.querySelector('.item-desc-input').value.trim(),
+        price: card.querySelector('.item-price-input').value,
+        link:  card.querySelector('.item-link-input').value.trim(),
+        preview
+      };
+    }).filter(it => it.desc || it.price);
+  }
+
+  function toggleInspiration(btn) {
+    const cards = btn.nextElementSibling;
+    const open = btn.classList.toggle('open');
+    cards.style.display = open ? '' : 'none';
+  }
+
+  function checkDescHint(idx, len) {
+    const el = document.getElementById('desc-hint-' + idx);
+    if (!el) return;
+    el.classList.toggle('show', len > 0 && len < 150);
+  }
+
+  function updateRemaining() {
+    const el = document.getElementById('today-remaining');
+    if (!el || !todayDayNumber) return;
+    const deposit = amountForDay(todayDayNumber);
+    const total = todayItems.reduce((s, it) => s + (parseFloat(it.price) || 0), 0);
+    if (total > 0) {
+      const rem = deposit - total;
+      const cls = rem < 0 ? 'rem-amount over' : 'rem-amount';
+      el.style.display = 'block';
+      el.innerHTML = `Remaining: <span class="${cls}">${formatMoney(rem)}</span>`;
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  function buildPreviewCardHtml(data, url) {
+    let hostname = url;
+    try { hostname = new URL(url).hostname; } catch(_) {}
+    const site  = escHtml(decodeHtmlEntities(data.siteName || hostname));
+    const title = escHtml(decodeHtmlEntities(data.title || hostname));
+    const desc  = data.description ? escHtml(decodeHtmlEntities(data.description.slice(0, 180))) : '';
+    const hint  = escHtml(hostname);
+
+    if (data.image) {
+      return `<a class="link-preview-card" href="${escHtml(url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+        <div class="lp-hero">
+          <img class="lp-image" src="${escHtml(data.image)}" alt=""
+            onerror="this.style.opacity='0'">
+          <div class="lp-hero-overlay">
+            <div class="lp-site">${site}</div>
+            <div class="lp-title">${title}</div>
+          </div>
+        </div>
+        ${desc ? `<div class="lp-body"><div class="lp-desc">${desc}</div><div class="lp-link-hint">↗ ${hint}</div></div>` : `<div class="lp-body"><div class="lp-link-hint">↗ ${hint}</div></div>`}
+      </a>`;
+    } else {
+      return `<a class="link-preview-card" href="${escHtml(url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+        <div class="lp-text-header">
+          <div class="lp-site">${site}</div>
+          <div class="lp-title">${title}</div>
+        </div>
+        ${desc ? `<div class="lp-body"><div class="lp-desc">${desc}</div><div class="lp-link-hint">↗ ${hint}</div></div>` : `<div class="lp-body"><div class="lp-link-hint">↗ ${hint}</div></div>`}
+      </a>`;
+    }
+  }
+
+  async function fetchItemPreview(idx) {
+    const item = todayItems[idx];
+    if (!item || !item.link) return;
+    const url = item.link.trim();
+    if (!url.startsWith('http')) return;
+    const existing = linkPreviews[idx];
+    if (existing && existing !== 'loading' && existing._url === url) return;
+    const container = document.getElementById('item-preview-' + idx);
+    if (!container) return;
+    linkPreviews[idx] = 'loading';
+    container.innerHTML = '<div class="link-preview-loading">Fetching preview…</div>';
+    try {
+      const data = await fetch('/api/link-preview?url=' + encodeURIComponent(url)).then(r => r.json());
+      data._url = url;
+      linkPreviews[idx] = data;
+      container.innerHTML = (data.title || data.image) ? buildPreviewCardHtml(data, url) : '';
+    } catch (_) {
+      linkPreviews[idx] = null;
+      container.innerHTML = '';
+    }
+  }
+
+  function renderItems() {
+    const container = document.getElementById('items-container');
+    if (!container) return;
+    container.innerHTML = todayItems.map((item, i) => {
+      const preview = linkPreviews[i];
+      let previewHtml = '';
+      if (preview === 'loading') {
+        previewHtml = '<div class="link-preview-loading">Fetching preview…</div>';
+      } else if (preview && preview._url === item.link && (preview.title || preview.image)) {
+        previewHtml = buildPreviewCardHtml(preview, item.link);
+      }
+      return `
+        <div class="item-card" data-index="${i}">
+          <div class="item-inputs">
+            <div class="desc-field-wrap">
+              <textarea class="item-desc-input" rows="3" placeholder="How will you spend this prosperity to bring you joy? Describe the details of what you'll get and how you'll feel while experiencing it…"
+                oninput="todayItems[${i}].desc=this.value;checkDescHint(${i},this.value.length)">${escHtml(item.desc)}</textarea>
+              <div class="desc-hint${item.desc.length > 0 && item.desc.length < 150 ? ' show' : ''}" id="desc-hint-${i}">Keep going — the details are what bring this to life! 💖</div>
+            </div>
+            <div class="item-price-wrap">
+              <span class="price-currency">$</span>
+              <input type="number" class="item-price-input" placeholder="0.00" step="0.01" min="0"
+                value="${item.price !== '' ? escHtml(String(item.price)) : ''}"
+                oninput="todayItems[${i}].price=this.value;updateRemaining()">
+            </div>
+            <input type="url" class="item-link-input" placeholder="Link (optional)"
+              value="${escHtml(item.link)}"
+              oninput="todayItems[${i}].link=this.value"
+              onblur="fetchItemPreview(${i})">
+            <div id="item-preview-${i}">${previewHtml}</div>
+          </div>
+          <button class="item-remove" onclick="removeItem(${i})" title="Remove item">×</button>
+        </div>`;
+    }).join('');
+  }
+
+  function setFilter(f) {
+    historyFilter = f;
+    ['all', 'saved', 'missed'].forEach(id => {
+      document.getElementById('filter-' + id).classList.toggle('active', id === f);
+    });
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    const totalDays = todayDayNumber;
+    if (totalDays < 1) { list.innerHTML = '<div class="empty-state">No days yet.</div>'; return; }
+
+    let journaledCount = 0;
+    let html = '';
+
+    for (let d = totalDays; d >= 1; d--) {
+      const entry      = entries[d];
+      const notes      = entry ? (entry.spending_notes || '').trim() : '';
+      const isToday    = d === todayDayNumber;
+      const isPast     = d < todayDayNumber;
+      const items      = entry ? parseItems(entry) : [];
+      const hasItems   = items.length > 0;
+      const hasNote    = notes.length > 0;
+      const hasAnyEntry = hasNote || hasItems;
+
+      if (hasAnyEntry) journaledCount++;
+
+      if (historyFilter === 'saved'  && !hasAnyEntry) continue;
+      if (historyFilter === 'missed' && (hasAnyEntry || isToday)) continue;
+
+      const dateISO  = dayToDate(d);
+      const dateFull = new Date(dateISO + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+      const dateShort = formatDateShort(dateISO);
+
+      // ---- Skipped ----
+      if (!hasAnyEntry && !isToday) {
+        html += `<div class="day-card skipped"><div class="dc-skipped">Day ${d} · ${dateShort} — Not journaled yet</div></div>`;
+        continue;
+      }
+
+      // ---- Today with no entry ----
+      if (isToday && !hasAnyEntry) {
+        html += `
+          <div class="day-card today clickable" onclick="scrollToToday()">
+            <div class="dc-header">
+              <span class="dc-day-label">Day ${d}</span>
+              <span class="dc-date">${dateFull}</span>
+              <span class="dc-today-badge">Today</span>
+            </div>
+            <div class="dc-body"><div class="dc-pending">Add today's items above ↑</div></div>
+          </div>`;
+        continue;
+      }
+
+      // ---- Journaled day ----
+      // Find hero image from stored preview data
+      let heroImage = '';
+      for (const it of items) {
+        if (it.preview && it.preview.image) { heroImage = it.preview.image; break; }
+      }
+
+      // Build items list
+      const spent = items.reduce((s, it) => s + (parseFloat(it.price) || 0), 0);
+      let bodyContent = '';
+      if (hasItems) {
+        const itemRows = items.map(it => {
+          const priceHtml = (it.price !== '' && it.price != null)
+            ? `<span class="dc-item-price">$${Number(it.price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+            : '';
+          let linkHtml = '';
+          if (it.link) {
+            let hostname = it.link;
+            try { hostname = new URL(it.link).hostname; } catch(_) {}
+            const label = (it.preview && it.preview.site) ? escHtml(it.preview.site) : escHtml(hostname);
+            linkHtml = `<a class="dc-item-link" href="${escHtml(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${label}</a>`;
+          }
+          return `
+            <div class="dc-item">
+              ${it.desc ? `<div class="dc-item-desc">${escHtml(it.desc)}</div>` : ''}
+              <div class="dc-item-meta"><span>${linkHtml}</span>${priceHtml}</div>
+            </div>`;
+        }).join('');
+        bodyContent = `<div class="dc-items">${itemRows}</div>`;
+      } else if (hasNote) {
+        bodyContent = `<div class="dc-items"><div class="dc-item"><div class="dc-item-desc">${escHtml(notes)}</div></div></div>`;
+      }
+
+      const totalHtml = spent > 0
+        ? `<div class="dc-total">Total spent<strong>${formatMoney(spent)}</strong></div>`
+        : '';
+      const todayBadge = isToday ? `<span class="dc-today-badge">Today</span>` : '';
+      const clickAttr  = isToday ? 'onclick="scrollToToday()"' : '';
+
+      if (heroImage) {
+        html += `
+          <div class="day-card journaled clickable" ${clickAttr}>
+            <div class="dc-hero">
+              <img class="dc-hero-img" src="${escHtml(heroImage)}" alt="" onerror="this.style.opacity='0'">
+              <div class="dc-hero-overlay">
+                <div class="dc-day-label">Day ${d}${isToday ? ' · Today' : ''}</div>
+                <div class="dc-date">${dateFull}</div>
+              </div>
+            </div>
+            <div class="dc-body">${bodyContent}${totalHtml}</div>
+          </div>`;
+      } else {
+        html += `
+          <div class="day-card journaled clickable" ${clickAttr}>
+            <div class="dc-header">
+              <span class="dc-day-label">Day ${d}</span>
+              <span class="dc-date">${dateFull}</span>
+              ${todayBadge}
+            </div>
+            <div class="dc-body">${bodyContent}${totalHtml}</div>
+          </div>`;
+      }
+    }
+
+    if (!html) {
+      html = '<div class="empty-state">No entries match this filter.</div>';
+    }
+
+    // Summary footer
+    const totalSpent = Object.values(entries).reduce((sum, e) =>
+      sum + parseItems(e).reduce((s, it) => s + (parseFloat(it.price) || 0), 0), 0);
+    const journaledPct = totalDays > 1
+      ? Math.round((journaledCount / (totalDays - 1)) * 100)
+      : 0;
+    html += `
+      <div class="history-stats-row">
+        <div class="hs-item">
+          <div class="hs-label">Total Spent</div>
+          <div class="hs-value">${formatMoney(totalSpent)}</div>
+        </div>
+        <div class="hs-item">
+          <div class="hs-label">Days Journaled</div>
+          <div class="hs-value">${journaledCount} <span style="font-size:0.8rem;font-weight:normal;color:#a07840">/ ${totalDays}</span></div>
+        </div>
+        <div class="hs-item">
+          <div class="hs-label">Completion</div>
+          <div class="hs-value">${totalDays > 1 ? journaledPct + '%' : '—'}</div>
+        </div>
+      </div>`;
+
+    list.innerHTML = html;
+  }
+
+  function scrollToToday() {
+    document.getElementById('today-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ---- Settings panel (in-game) ----
+  function toggleSettings() {
+    document.getElementById('settings-panel').classList.toggle('open');
+  }
+
+  function populateSettingsPanel() {
+    if (!settings) return;
+    document.getElementById('s_game_mode').value = settings.game_mode;
+    document.getElementById('s_start_amount').value = settings.start_amount;
+    document.getElementById('s_start_date').value = settings.start_date;
+    sCustomType = settings.custom_type || 'add';
+    document.getElementById('s_custom_step').value = settings.custom_step || '';
+    document.getElementById('s_reminder_email').value = settings.reminder_email || '';
+    document.getElementById('s_reminder_time').value = settings.reminder_time || '08:00';
+    onSettingsModeChange();
+    updateSettingsCustomTypeUI();
+  }
+
+  function onSettingsModeChange() {
+    const mode = document.getElementById('s_game_mode').value;
+    document.getElementById('s-custom-row').style.display = mode === 'custom' ? 'grid' : 'none';
+  }
+
+  function setSettingsCustomType(type) {
+    sCustomType = type;
+    updateSettingsCustomTypeUI();
+  }
+
+  function updateSettingsCustomTypeUI() {
+    document.getElementById('s-tog-add').classList.toggle('active', sCustomType === 'add');
+    document.getElementById('s-tog-multiply').classList.toggle('active', sCustomType === 'multiply');
+    document.getElementById('s-custom-step-label').textContent =
+      sCustomType === 'add' ? 'Daily Increment ($)' : 'Daily Multiplier';
+  }
+
+  async function saveSettings() {
+    const mode = document.getElementById('s_game_mode').value;
+    const payload = {
+      game_mode: mode,
+      start_amount: Number(document.getElementById('s_start_amount').value),
+      start_date: document.getElementById('s_start_date').value,
+      custom_type: sCustomType,
+      custom_step: mode === 'custom' ? Number(document.getElementById('s_custom_step').value) : null,
+      reminder_email: document.getElementById('s_reminder_email').value.trim() || null,
+      reminder_time: document.getElementById('s_reminder_time').value || '08:00'
+    };
+    await authFetch('/api/settings', { method: 'POST', body: JSON.stringify(payload) });
+    settings = payload;
+    flashBadge('settings-saved');
+    render();
+  }
+
+  async function sendTestEmail() {
+    const statusEl = document.getElementById('test-email-status');
+    statusEl.textContent = 'Sending…';
+    statusEl.style.opacity = '1';
+    try {
+      const r = await authFetch('/api/send-test-email', { method: 'POST' });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Failed');
+      statusEl.textContent = 'Sent! ✓';
+      setTimeout(() => { statusEl.style.opacity = '0'; }, 4000);
+    } catch (err) {
+      statusEl.textContent = err.message;
+      setTimeout(() => { statusEl.style.opacity = '0'; }, 5000);
+    }
+  }
+
+  // ---- Save today ----
+  const PROSPERITY_QUOTES = [
+    "As you imagine, visualize, and verbalize your new narrative, you will eventually believe it, and evidence of it will quickly appear in your experience.",
+    "Stop complaining and start appreciating; describe things as you want them to be, not as they have been.",
+    "You pretty much have to get over feeling bad about money if you're ever going to allow it to flow in a really strong way.",
+    "Abundance flows into my life with grace and ease. Prosperity of every kind is drawn to me and is flowing to me.",
+    "When you visualize purely for the enjoyment of it, without the intention of fixing a deficiency, your thoughts are purer and more powerful.",
+    "The entire universe is working to fulfill your desires. Your ability to create has no limits, and everything is subject to change.",
+    "Your life will simply be as good as you allow it to be.",
+    "Consider yourself a human magnet, constantly attracting what you think, speak, and feel."
+  ];
+
+  async function saveToday() {
+    if (!settings || !todayDayNumber) return;
+    const items = collectItems();
+    const amount = amountForDay(todayDayNumber);
+    const result = await authFetch('/api/entries', {
+      method: 'POST',
+      body: JSON.stringify({ day_number: todayDayNumber, amount, spending_notes: '', spending_items: items })
+    }).then(r => r.json());
+    entries[todayDayNumber] = result;
+    todayItems = items;
+    flashBadge('today-saved');
+    updateEntryStatus();
+    renderHistory();
+    showProsperityQuote();
+  }
+
+  function showProsperityQuote() {
+    const el = document.getElementById('prosperity-quote');
+    if (!el) return;
+    const quote = PROSPERITY_QUOTES[Math.floor(Math.random() * PROSPERITY_QUOTES.length)];
+    el.textContent = `"${quote}"`;
+    el.classList.add('show');
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => el.classList.remove('show'), 6000);
+  }
+
+  function flashBadge(id) {
+    const el = document.getElementById(id);
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+  }
+
+  // ---- Reset game ----
+  async function confirmReset() {
+    const ok = confirm('Reset everything? This will delete all settings and journal entries and cannot be undone.');
+    if (!ok) return;
+    await authFetch('/api/reset', { method: 'DELETE' });
+    settings = null;
+    entries  = {};
+    todayDayNumber = null;
+    historyFilter  = 'all';
+    // Close settings panel
+    document.getElementById('settings-panel').classList.remove('open');
+    showOnboarding();
+  }
+
+  // ---- Boot ----
+  init();
+</script>
+</body>
+</html>

@@ -398,7 +398,7 @@ cron.schedule('* * * * *', () => {
   const hh  = String(now.getHours()).padStart(2, '0');
   const mm  = String(now.getMinutes()).padStart(2, '0');
   const currentTime = `${hh}:${mm}`;
-  const todayStr    = now.toISOString().slice(0, 10);
+  const todayStr    = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   const allSettings = db.prepare(
     'SELECT * FROM user_settings WHERE reminder_email IS NOT NULL AND reminder_time IS NOT NULL'

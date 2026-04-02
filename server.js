@@ -152,6 +152,7 @@ app.get('/api/settings', requireAuth, (req, res) => {
 
 app.post('/api/settings', requireAuth, (req, res) => {
   const { game_mode, start_amount, start_date, custom_type, custom_step, reminder_email, reminder_time } = req.body;
+  const isNew = !db.prepare('SELECT id FROM user_settings WHERE user_id = ?').get(req.userId);
   db.prepare(`
     INSERT INTO user_settings (user_id, game_mode, start_amount, start_date, custom_type, custom_step, reminder_email, reminder_time)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -168,6 +169,15 @@ app.post('/api/settings', requireAuth, (req, res) => {
     custom_type ?? 'add', custom_step ?? null,
     reminder_email ?? null, reminder_time ?? '08:00'
   );
+  // Send day 1 reminder immediately for new users who opted into emails
+  if (isNew && reminder_email) {
+    const s = db.prepare('SELECT * FROM user_settings WHERE user_id = ?').get(req.userId);
+    const dayNum = calcDayNumber(s);
+    const amount = calcDepositAmount(s, Math.max(dayNum, 1));
+    sendReminderEmail(reminder_email, Math.max(dayNum, 1), amount)
+      .then(() => console.log(`Welcome reminder sent to ${reminder_email}`))
+      .catch(err => console.error(`Welcome reminder failed for ${reminder_email}:`, err.message));
+  }
   res.json({ ok: true });
 });
 

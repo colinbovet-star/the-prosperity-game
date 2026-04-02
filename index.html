@@ -1788,7 +1788,8 @@
 
   // ---- Helpers ----
   function todayISO() {
-    return new Date().toISOString().slice(0, 10);
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
   function daysBetween(isoA, isoB) {
@@ -1846,7 +1847,7 @@
   function dayToDate(dayNum) {
     const base = new Date(settings.start_date + 'T00:00:00');
     base.setDate(base.getDate() + dayNum - 1);
-    return base.toISOString().slice(0, 10);
+    return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, '0')}-${String(base.getDate()).padStart(2, '0')}`;
   }
 
   function formatDateShort(iso) {

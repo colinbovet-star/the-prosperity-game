@@ -1605,22 +1605,6 @@
     </div>
   </div>
 
-  <!-- Stats bar -->
-  <div class="stats-bar" id="stats-bar" style="display:none">
-    <div class="stat-item">
-      <div class="stat-label">Day</div>
-      <div class="stat-value large" id="stat-day">—</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">Today's Deposit</div>
-      <div class="stat-value" id="stat-today">—</div>
-    </div>
-    <div class="stat-item stat-total">
-      <div class="stat-label">Total Received</div>
-      <div class="stat-value" id="stat-total">—</div>
-    </div>
-  </div>
-
   <!-- Today -->
   <div id="today-section" class="today-card" style="display:none">
 
@@ -1701,6 +1685,22 @@
     </div>
   </div>
 
+  <!-- Stats bar -->
+  <div class="stats-bar" id="stats-bar" style="display:none">
+    <div class="stat-item">
+      <div class="stat-label">Day</div>
+      <div class="stat-value large" id="stat-day">—</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Today's Deposit</div>
+      <div class="stat-value" id="stat-today">—</div>
+    </div>
+    <div class="stat-item stat-total">
+      <div class="stat-label">Total Received</div>
+      <div class="stat-value" id="stat-total">—</div>
+    </div>
+  </div>
+
   <!-- History -->
   <div id="history-section" style="display:none">
     <div class="history-header">
@@ -1728,6 +1728,7 @@
   let todayItems = []; // [{ desc, price, link }]
   let linkPreviews = {}; // idx -> preview object | 'loading' | null
   let isDirty = false;
+  let activeDayNumber = null; // day currently being edited (may differ from todayDayNumber for past edits)
 
   function markDirty() {
     isDirty = true;
@@ -1797,7 +1798,7 @@
   function logout() {
     localStorage.removeItem('pg_jwt');
     localStorage.removeItem('pg_email');
-    settings = null; entries = {}; todayDayNumber = null;
+    settings = null; entries = {}; todayDayNumber = null; activeDayNumber = null;
     historyFilter = 'all'; todayItems = []; linkPreviews = {};
     showLoginScreen();
     showLoginForm();
@@ -2041,41 +2042,72 @@
     document.getElementById('stat-today').textContent = formatMoney(todayAmount);
     document.getElementById('stat-total').textContent = formatMoney(total);
 
-    // Today card
+    // Load today's day for editing
+    activeDayNumber = todayDayNumber;
+    loadDayForEditing(todayDayNumber, true);
+
+    document.getElementById('history-section').style.display = 'block';
+    renderHistory();
+  }
+
+  function loadDayForEditing(d, animate) {
     const todaySection = document.getElementById('today-section');
     todaySection.style.display = 'block';
-    todaySection.classList.add('slide-up');
-    const amountEl = document.getElementById('today-amount-display');
-    amountEl.textContent = formatMoney(todayAmount);
-    amountEl.classList.remove('animating');
-    void amountEl.offsetWidth; // force reflow
-    amountEl.classList.add('animating');
-    spawnDepositParticles();
+    if (animate) todaySection.classList.add('slide-up');
 
-    const dateObj = new Date(todayISO() + 'T00:00:00');
+    activeDayNumber = d;
+    const amount = amountForDay(d);
+    const amountEl = document.getElementById('today-amount-display');
+    amountEl.textContent = formatMoney(amount);
+    if (animate) {
+      amountEl.classList.remove('animating');
+      void amountEl.offsetWidth;
+      amountEl.classList.add('animating');
+      spawnDepositParticles();
+    }
+
+    const dateISO = dayToDate(d);
+    const dateObj = new Date(dateISO + 'T00:00:00');
     document.getElementById('today-date-display').textContent =
       dateObj.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
-    document.getElementById('today-day-label').textContent = 'Day ' + todayDayNumber;
+    document.getElementById('today-day-label').textContent = 'Day ' + d +
+      (d === todayDayNumber ? '' : ' (editing past day)');
 
-    const todayEntry = entries[todayDayNumber];
-    const parsed = todayEntry ? parseItems(todayEntry) : [];
-    todayItems = parsed.length > 0
-      ? parsed.map(it => ({ ...it, showLink: !!it.link }))
-      : [{ desc: '', price: '', link: '', showLink: false }];
+    // Reset closed-out UI
+    const state = document.getElementById('closed-out-state');
+    const container = document.getElementById('items-container');
+    const addBtn = document.querySelector('.btn-add-item');
+    const label = document.querySelector('.items-entry-label');
+    const prompt = document.querySelector('.today-prompt');
+    if (state) state.classList.remove('visible');
+    [container, addBtn, label, prompt].forEach(el => {
+      if (el) { el.style.display = ''; el.style.opacity = ''; el.style.transition = ''; }
+    });
+
+    const entry = entries[d];
+    const parsed = entry ? parseItems(entry) : [];
+    todayItems = parsed.length > 0 ? parsed : [{ desc: '', price: '', link: '' }];
     linkPreviews = {};
     renderItems();
     updateRemaining();
     updateEntryStatus();
     todayItems.forEach((item, i) => { if (item.link) fetchItemPreview(i); });
 
-    document.getElementById('history-section').style.display = 'block';
-    renderHistory();
+    // Restore closed-out state if this day was already fully spent and saved
+    if (entry) {
+      const deposit = amountForDay(d);
+      const spent = parsed.reduce((s, it) => s + (parseFloat(it.price) || 0), 0);
+      if (spent > 0 && Math.abs(deposit - spent) < 0.005) {
+        [container, addBtn, label, prompt].forEach(el => { if (el) el.style.display = 'none'; });
+        if (state) state.classList.add('visible');
+      }
+    }
   }
 
   function updateEntryStatus() {
     const el = document.getElementById('entry-status');
     if (!el) return;
-    const entry = entries[todayDayNumber];
+    const entry = entries[activeDayNumber];
     const items = entry ? parseItems(entry) : [];
     if (items.length > 0) {
       el.textContent = items.length + ' item' + (items.length > 1 ? 's' : '') + ' saved';
@@ -2193,8 +2225,8 @@
 
   function updateRemaining() {
     const el = document.getElementById('today-remaining');
-    if (!el || !todayDayNumber) return;
-    const deposit = amountForDay(todayDayNumber);
+    if (!el || !activeDayNumber) return;
+    const deposit = amountForDay(activeDayNumber);
     const total = todayItems.reduce((s, it) => s + (parseFloat(it.price) || 0), 0);
     if (total > 0) {
       const rem = deposit - total;
@@ -2401,7 +2433,8 @@
         ? `<div class="dc-total">Total spent<strong>${formatMoney(spent)}</strong></div>`
         : '';
       const todayBadge = isToday ? `<span class="dc-today-badge">Today</span>` : '';
-      const clickAttr  = isToday ? 'onclick="scrollToToday()"' : '';
+      const clickAttr  = isToday ? 'onclick="scrollToToday()"' : `onclick="editPastDay(${d})"`;
+
 
       if (heroImage) {
         html += `
@@ -2458,6 +2491,11 @@
   }
 
   function scrollToToday() {
+    document.getElementById('today-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function editPastDay(d) {
+    loadDayForEditing(d, false);
     document.getElementById('today-section').scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -2544,14 +2582,14 @@
   ];
 
   async function saveToday() {
-    if (!settings || !todayDayNumber) return;
+    if (!settings || !activeDayNumber) return;
     const items = collectItems();
-    const amount = amountForDay(todayDayNumber);
+    const amount = amountForDay(activeDayNumber);
     const result = await authFetch('/api/entries', {
       method: 'POST',
-      body: JSON.stringify({ day_number: todayDayNumber, amount, spending_notes: '', spending_items: items })
+      body: JSON.stringify({ day_number: activeDayNumber, amount, spending_notes: '', spending_items: items })
     }).then(r => r.json());
-    entries[todayDayNumber] = result;
+    entries[activeDayNumber] = result;
     todayItems = items;
     clearDirty();
     flashBadge('today-saved');
@@ -2577,7 +2615,7 @@
     spawnSaveParticles();
 
     // Show closed-out celebration if fully spent
-    const deposit = amountForDay(todayDayNumber);
+    const deposit = amountForDay(activeDayNumber);
     const total = items.reduce((s, it) => s + (parseFloat(it.price) || 0), 0);
     if (total > 0 && Math.abs(deposit - total) < 0.005) {
       showClosedOut();
@@ -2625,6 +2663,7 @@
     settings = null;
     entries  = {};
     todayDayNumber = null;
+    activeDayNumber = null;
     historyFilter  = 'all';
     // Close settings panel
     document.getElementById('settings-panel').classList.remove('open');

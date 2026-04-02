@@ -358,8 +358,11 @@ function buildMagicLinkEmail(token, email) {
         </tr>
         <tr>
           <td style="padding:16px 40px;text-align:center;border-top:1px solid #f0e8d0;">
-            <p style="margin:0;font-size:11px;color:#ccc;">
+            <p style="margin:0 0 8px;font-size:11px;color:#ccc;">
               Or copy this link: <span style="color:#c8952a">${url}</span>
+            </p>
+            <p style="margin:0;font-size:12px;color:#aaa;">
+              Already signed in? <a href="https://www.the-prosperity-game.com/" style="color:#c8952a;text-decoration:none;">Visit the Prosperity Game →</a>
             </p>
           </td>
         </tr>

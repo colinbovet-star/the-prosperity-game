@@ -28,7 +28,25 @@
       "Bash(openssl rand:*)",
       "Bash(/opt/homebrew/bin/node -e \":*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo:*)",
+      "Bash(PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH gh repo create the-prosperity-game --public --source=. --remote=origin --push)",
+      "Bash(PATH=/opt/homebrew/bin:$PATH npm install -g @railway/cli)",
+      "Bash(PATH=/opt/homebrew/bin:$PATH railway --version)",
+      "Bash(PATH=/opt/homebrew/bin:$PATH brew install gh)",
+      "Bash(PATH=/opt/homebrew/bin:$PATH gh --version)",
+      "Bash(PATH=/opt/homebrew/bin:$PATH gh auth login)",
+      "Bash(PATH=/opt/homebrew/bin:$PATH gh repo create the-prosperity-game --public --source=. --remote=origin --push)",
+      "Bash(PATH=/opt/homebrew/bin:$PATH git push)",
+      "Bash(PATH=/opt/homebrew/bin:$PATH /opt/homebrew/bin/node -e \":*)",
+      "Bash(git push:*)",
+      "Bash(python3 -c \"from PIL import Image, ImageDraw, ImageFont; print\\(''PIL ok''\\)\")",
+      "Bash(pip3 install:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(ls /Users/colinbovet/prosperity-game/.git/*.lock)",
+      "Bash(git stash:*)"
     ]
   }
 }

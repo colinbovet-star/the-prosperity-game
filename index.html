@@ -863,9 +863,35 @@
     }
     .item-remove-row {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
       margin-top: 0.35rem;
     }
+    .item-save-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-save-inline {
+      background: var(--gold);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 0.35rem 0.85rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.15s ease, background 0.15s;
+    }
+    .btn-save-inline.dirty {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .btn-save-inline:hover { background: var(--gold-dark); }
+    .btn-save-inline.btn-save-pop { animation: savePop 0.55s cubic-bezier(0.34,1.56,0.64,1); }
     .desc-field-wrap {
       position: relative;
       border: 1.5px solid var(--border-2);
@@ -1539,11 +1565,6 @@
       <div class="items-entry-label">✍️ Your spending entry</div>
       <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
       <div id="items-container"></div>
-      <div class="today-actions">
-        <button class="btn-primary" id="btn-save-entry" onclick="saveToday()">Save Entry</button>
-        <span id="today-saved" class="saved-badge">Saved!</span>
-        <span class="entry-status" id="entry-status"></span>
-      </div>
       <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
     </div>
     <div id="prosperity-quote" class="prosperity-quote"></div>
@@ -1585,6 +1606,18 @@
   let historyFilter = 'all';
   let todayItems = []; // [{ desc, price, link }]
   let linkPreviews = {}; // idx -> preview object | 'loading' | null
+  let isDirty = false;
+
+  function markDirty() {
+    isDirty = true;
+    const btn = document.getElementById('btn-save-entry');
+    if (btn) btn.classList.add('dirty');
+  }
+  function clearDirty() {
+    isDirty = false;
+    const btn = document.getElementById('btn-save-entry');
+    if (btn) btn.classList.remove('dirty');
+  }
 
   // ---- Auth helpers ----
   function getJwt()   { return localStorage.getItem('pg_jwt'); }
@@ -1930,6 +1963,7 @@
 
   function updateEntryStatus() {
     const el = document.getElementById('entry-status');
+    if (!el) return;
     const entry = entries[todayDayNumber];
     const items = entry ? parseItems(entry) : [];
     if (items.length > 0) {
@@ -1951,6 +1985,7 @@
 
   function addItem() {
     todayItems.push({ desc: '', price: '', link: '' });
+    markDirty();
     renderItems();
     const rows = document.querySelectorAll('.item-card');
     if (rows.length) rows[rows.length - 1].querySelector('.item-desc-input').focus();
@@ -1965,6 +2000,7 @@
       else if (ki > idx) shifted[ki - 1] = v;
     });
     linkPreviews = shifted;
+    markDirty();
     renderItems();
     updateRemaining();
   }
@@ -2114,22 +2150,27 @@
           <div class="item-inputs">
             <div class="desc-field-wrap">
               <textarea class="item-desc-input" rows="3" placeholder="How will you spend this prosperity to bring you joy? Describe the details of what you'll get and how you'll feel while experiencing it…"
-                oninput="todayItems[${i}].desc=this.value;checkDescHint(${i},this.value.length)">${escHtml(item.desc)}</textarea>
+                oninput="todayItems[${i}].desc=this.value;checkDescHint(${i},this.value.length);markDirty()">${escHtml(item.desc)}</textarea>
               <div class="desc-hint${item.desc.length > 0 && item.desc.length < 150 ? ' show' : ''}" id="desc-hint-${i}">Keep going. The details are what bring this to life! 💖</div>
             </div>
             <div class="item-price-wrap">
               <span class="price-currency">$</span>
               <input type="number" class="item-price-input" placeholder="0.00" step="0.01" min="0"
                 value="${item.price !== '' ? escHtml(String(item.price)) : ''}"
-                oninput="todayItems[${i}].price=this.value;updateRemaining()">
+                oninput="todayItems[${i}].price=this.value;updateRemaining();markDirty()">
             </div>
             <input type="url" class="item-link-input" placeholder="Link (optional)"
               value="${escHtml(item.link)}"
-              oninput="todayItems[${i}].link=this.value"
+              oninput="todayItems[${i}].link=this.value;markDirty()"
               onblur="fetchItemPreview(${i})">
             <div id="item-preview-${i}">${previewHtml}</div>
             <div class="item-remove-row">
               <button class="item-remove" onclick="removeItem(${i})">🗑 Remove item</button>
+              ${i === todayItems.length - 1 ? `
+              <div class="item-save-group">
+                <span id="today-saved" class="saved-badge">Saved!</span>
+                <button class="btn-save-inline${isDirty ? ' dirty' : ''}" id="btn-save-entry" onclick="saveToday()">Save Entry</button>
+              </div>` : ''}
             </div>
           </div>
         </div>`;
@@ -2380,6 +2421,7 @@
     }).then(r => r.json());
     entries[todayDayNumber] = result;
     todayItems = items;
+    clearDirty();
     flashBadge('today-saved');
     updateEntryStatus();
     renderHistory();

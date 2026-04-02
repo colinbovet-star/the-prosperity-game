@@ -291,6 +291,28 @@
     .preview-box strong { color: var(--text); }
 
     .start-btn-wrap { text-align: center; }
+    .ob-reminder-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.1rem;
+    }
+    .ob-reminder-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .ob-reminder-label input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--gold);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
     .btn-start {
       background: linear-gradient(135deg, #d4a030 0%, #b87820 100%);
       color: #fff;
@@ -1460,6 +1482,12 @@
     <!-- Preview -->
     <div class="preview-box" id="ob-preview"></div>
 
+    <div class="ob-reminder-row">
+      <label class="ob-reminder-label">
+        <input type="checkbox" id="ob_reminder_opt_in" checked />
+        Send me a daily reminder email at 8:00 AM
+      </label>
+    </div>
     <div class="start-btn-wrap">
       <button class="btn-start" onclick="startGame()">Start My Game</button>
     </div>
@@ -1940,12 +1968,15 @@
     if (!start_date) { alert('Please pick a start date.'); return; }
     if (!start_amount || start_amount < 1) { alert('Please enter a valid starting amount.'); return; }
 
+    const reminderOptIn = document.getElementById('ob_reminder_opt_in').checked;
     const payload = {
       game_mode: obMode,
       start_amount,
       start_date,
       custom_type: obCustomType,
-      custom_step: obMode === 'custom' ? custom_step : null
+      custom_step: obMode === 'custom' ? custom_step : null,
+      reminder_email: reminderOptIn ? getEmail() : null,
+      reminder_time: '08:00'
     };
 
     await authFetch('/api/settings', { method: 'POST', body: JSON.stringify(payload) });

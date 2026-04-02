@@ -409,32 +409,31 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ---- Game header + topbar ---- */
+    /* ---- Game header ---- */
     .game-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+      text-align: center;
       margin-bottom: 2rem;
     }
-    .game-header h1 { margin-bottom: 0.15rem; font-size: 1.75rem; }
-    .game-header .subtitle { margin-bottom: 0; text-align: left; }
-    .game-header-left { flex: 1; }
-    .game-header-right {
+    .game-header h1 { margin-bottom: 0.15rem; font-size: 1.9rem; }
+    .game-header .subtitle { margin-bottom: 0; text-align: center; margin-left: auto; margin-right: auto; }
+
+    /* ---- Settings sign-out row ---- */
+    .settings-account-row {
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.3rem;
-      padding-top: 0.2rem;
-      flex-shrink: 0;
-      margin-left: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      gap: 0.75rem;
     }
-    .topbar-email {
-      font-size: 0.75rem;
+    .settings-account-email {
+      font-size: 0.78rem;
       color: var(--text-muted);
-      max-width: 160px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
     }
     .btn-signout {
       background: none;
@@ -442,9 +441,11 @@
       color: var(--text-muted);
       font-size: 0.72rem;
       font-family: inherit;
-      padding: 0.25rem 0.6rem;
+      padding: 0.3rem 0.75rem;
       border-radius: 20px;
       cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: border-color 0.15s, color 0.15s;
     }
     .btn-signout:hover { border-color: var(--gold); color: var(--brown); }
@@ -554,6 +555,17 @@
     @media (max-width: 480px) {
       .stats-bar { grid-template-columns: 1fr 1fr; }
       .stats-bar .stat-total { grid-column: span 2; }
+    }
+    @media (max-width: 480px) {
+      .today-spend-area {
+        padding: 1.1rem 0.65rem 1.3rem;
+      }
+      .items-entry-area {
+        padding: 0.9rem 0.7rem 0.85rem;
+      }
+      .item-card {
+        padding: 0.6rem 0.55rem 0.55rem;
+      }
     }
     .stat-item {
       background: #fff;
@@ -667,7 +679,7 @@
     }
     .today-amount.animating {
       animation: depositPop 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards,
-                 shimmer 2s ease-in-out 0.7s 2;
+                 shimmer 2s ease-in-out 0.7s 3;
     }
     .deposit-meta-row {
       display: flex;
@@ -706,6 +718,23 @@
     @keyframes floatUp {
       0%   { opacity: 0.9; transform: translateY(0) scale(1); }
       100% { opacity: 0;   transform: translateY(-80px) scale(0.5); }
+    }
+    @keyframes savePop {
+      0%   { transform: scale(1); }
+      25%  { transform: scale(0.93); }
+      55%  { transform: scale(1.07); }
+      75%  { transform: scale(0.97); }
+      100% { transform: scale(1); }
+    }
+    @keyframes entryGlow {
+      0%, 100% { box-shadow: 0 2px 10px rgba(180,130,30,0.09); border-color: rgba(200,149,42,0.38); }
+      50%       { box-shadow: 0 4px 28px rgba(200,149,42,0.45), 0 0 0 3px rgba(200,149,42,0.15); border-color: rgba(200,149,42,0.75); }
+    }
+    .btn-save-pop {
+      animation: savePop 0.55s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .items-entry-area.entry-saved {
+      animation: entryGlow 0.9s ease-in-out 2;
     }
 
     /* Spending area */
@@ -790,24 +819,52 @@
       color: var(--text-muted);
       line-height: 1.4;
     }
+    /* ---- Items entry area ---- */
+    .items-entry-area {
+      background: #fffef9;
+      border: 1.5px solid rgba(200,149,42,0.38);
+      border-radius: 12px;
+      padding: 1.1rem 1.1rem 1rem;
+      margin-top: 0.5rem;
+      box-shadow: 0 2px 10px rgba(180,130,30,0.09);
+      position: relative;
+      overflow: hidden;
+    }
+    .items-entry-label {
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .items-entry-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(200,149,42,0.22);
+    }
+
     /* ---- Spending items ---- */
     #items-container { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.6rem; }
     .item-card {
-      background: rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.85);
       border: 1.5px solid rgba(200,149,42,0.3);
       border-radius: 8px;
-      padding: 0.75rem 0.9rem 0.7rem;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      column-gap: 0.5rem;
-      row-gap: 0.45rem;
-      align-items: start;
+      padding: 0.75rem 0.9rem 0.55rem;
     }
     .item-inputs {
       display: flex;
       flex-direction: column;
       gap: 0.45rem;
-      min-width: 0;
+    }
+    .item-remove-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.35rem;
     }
     .desc-field-wrap {
       position: relative;
@@ -874,17 +931,18 @@
     .item-remove {
       background: none;
       border: none;
-      color: #c0a060;
-      font-size: 1.2rem;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-family: inherit;
       line-height: 1;
-      padding: 0.15rem 0.25rem;
+      padding: 0.25rem 0.5rem;
       cursor: pointer;
       border-radius: 4px;
-      align-self: start;
-      margin-top: 0.4rem;
-      transition: color 0.15s;
+      opacity: 0.7;
+      letter-spacing: 0.01em;
+      transition: color 0.15s, opacity 0.15s;
     }
-    .item-remove:hover { color: #c0392b; }
+    .item-remove:hover { color: #c0392b; opacity: 1; }
     .item-link-input {
       width: 100%;
       padding: 0.35rem 0.6rem;
@@ -1333,14 +1391,8 @@
 <!-- ===================== GAME VIEW ===================== -->
 <div id="game" class="container">
   <div class="game-header">
-    <div class="game-header-left">
-      <h1>Prosperity Game</h1>
-      <p class="subtitle">Your daily practice in abundance thinking. Each day the Universe deposits a little more into your account. Spend it all with joy.</p>
-    </div>
-    <div class="game-header-right">
-      <span class="topbar-email" id="topbar-email"></span>
-      <button class="btn-signout" onclick="logout()">Sign out</button>
-    </div>
+    <h1>Prosperity Game</h1>
+    <p class="subtitle">Your daily practice in abundance thinking. Each day the Universe deposits a little more into your account. Spend it all with joy.</p>
   </div>
 
   <!-- Settings panel (collapsible, animated) -->
@@ -1403,6 +1455,10 @@
       <div class="settings-danger">
         <button class="btn-danger" onclick="confirmReset()">Reset Game</button>
         <p>Clears all data and returns to setup</p>
+      </div>
+      <div class="settings-account-row">
+        <span class="settings-account-email" id="settings-account-email"></span>
+        <button class="btn-signout" onclick="logout()">Sign out</button>
       </div>
     </div>
   </div>
@@ -1478,13 +1534,17 @@
       </div>
     </div>
 
-    <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
-    <div id="items-container"></div>
-    <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
-    <div class="today-actions">
-      <button class="btn-primary" onclick="saveToday()">Save Entry</button>
-      <span id="today-saved" class="saved-badge">Saved!</span>
-      <span class="entry-status" id="entry-status"></span>
+    <div class="items-entry-area" id="items-entry-area">
+      <div class="deposit-particles" id="save-particles"></div>
+      <div class="items-entry-label">✍️ Your spending entry</div>
+      <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
+      <div id="items-container"></div>
+      <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
+      <div class="today-actions">
+        <button class="btn-primary" id="btn-save-entry" onclick="saveToday()">Save Entry</button>
+        <span id="today-saved" class="saved-badge">Saved!</span>
+        <span class="entry-status" id="entry-status"></span>
+      </div>
     </div>
     <div id="prosperity-quote" class="prosperity-quote"></div>
     </div><!-- end today-spend-area -->
@@ -1648,7 +1708,6 @@
 
   async function loadApp() {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('topbar-email').textContent   = getEmail();
     document.getElementById('ob_start_date').value        = todayISO();
     loadBMCWidget();
 
@@ -1938,7 +1997,25 @@
       span.style.fontSize = (0.8 + Math.random() * 0.8) + 'rem';
       container.appendChild(span);
     }
-    setTimeout(() => { if (container) container.innerHTML = ''; }, 3000);
+    setTimeout(() => { if (container) container.innerHTML = ''; }, 4000);
+  }
+
+  function spawnSaveParticles() {
+    const container = document.getElementById('save-particles');
+    if (!container) return;
+    container.innerHTML = '';
+    const emojis = ['✨', '💛', '🌟', '💚', '⭐', '🎉', '💫', '🙌'];
+    for (let i = 0; i < 10; i++) {
+      const span = document.createElement('span');
+      span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      span.style.left   = Math.random() * 100 + '%';
+      span.style.bottom = (5 + Math.random() * 50) + '%';
+      span.style.animationDelay = (Math.random() * 0.5) + 's';
+      span.style.animationDuration = (1 + Math.random() * 0.8) + 's';
+      span.style.fontSize = (0.7 + Math.random() * 0.6) + 'rem';
+      container.appendChild(span);
+    }
+    setTimeout(() => { if (container) container.innerHTML = ''; }, 2500);
   }
 
   function toggleInspiration(btn) {
@@ -2051,8 +2128,10 @@
               oninput="todayItems[${i}].link=this.value"
               onblur="fetchItemPreview(${i})">
             <div id="item-preview-${i}">${previewHtml}</div>
+            <div class="item-remove-row">
+              <button class="item-remove" onclick="removeItem(${i})">🗑 Remove item</button>
+            </div>
           </div>
-          <button class="item-remove" onclick="removeItem(${i})" title="Remove item">×</button>
         </div>`;
     }).join('');
   }
@@ -2223,6 +2302,8 @@
     document.getElementById('s_custom_step').value = settings.custom_step || '';
     document.getElementById('s_reminder_email').value = settings.reminder_email || getEmail();
     document.getElementById('s_reminder_time').value = settings.reminder_time || '08:00';
+    const emailEl = document.getElementById('settings-account-email');
+    if (emailEl) emailEl.textContent = getEmail();
     onSettingsModeChange();
     updateSettingsCustomTypeUI();
   }
@@ -2303,6 +2384,23 @@
     updateEntryStatus();
     renderHistory();
     showProsperityQuote();
+
+    // Animate save
+    const saveBtn = document.getElementById('btn-save-entry');
+    if (saveBtn) {
+      saveBtn.classList.remove('btn-save-pop');
+      void saveBtn.offsetWidth;
+      saveBtn.classList.add('btn-save-pop');
+      saveBtn.addEventListener('animationend', () => saveBtn.classList.remove('btn-save-pop'), { once: true });
+    }
+    const entryArea = document.getElementById('items-entry-area');
+    if (entryArea) {
+      entryArea.classList.remove('entry-saved');
+      void entryArea.offsetWidth;
+      entryArea.classList.add('entry-saved');
+      entryArea.addEventListener('animationend', () => entryArea.classList.remove('entry-saved'), { once: true });
+    }
+    spawnSaveParticles();
   }
 
   function showProsperityQuote() {

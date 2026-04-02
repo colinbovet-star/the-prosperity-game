@@ -291,6 +291,28 @@
     .preview-box strong { color: var(--text); }
 
     .start-btn-wrap { text-align: center; }
+    .ob-reminder-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.1rem;
+    }
+    .ob-reminder-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .ob-reminder-label input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--gold);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
     .btn-start {
       background: linear-gradient(135deg, #d4a030 0%, #b87820 100%);
       color: #fff;
@@ -581,6 +603,9 @@
       .item-card {
         padding: 0.6rem 0.55rem 0.55rem;
       }
+      .btn-save-inline { width: 100%; }
+      .item-save-group { width: 100%; }
+      .item-remove-row { flex-direction: column-reverse; gap: 0.5rem; }
     }
     .stat-item {
       background: #fff;
@@ -891,9 +916,10 @@
       background: var(--gold);
       color: #fff;
       font-family: inherit;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       font-weight: bold;
-      padding: 0.35rem 0.85rem;
+      padding: 0.55rem 0.85rem;
+      min-height: 44px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
@@ -924,10 +950,12 @@
       border: none;
       border-radius: 6px;
       background: transparent;
-      font-size: 0.92rem;
+      font-size: 1rem;
       font-family: Georgia, serif;
       color: var(--text);
-      resize: vertical;
+      resize: none;
+      overflow-y: hidden;
+      min-height: 80px;
       line-height: 1.5;
       display: block;
     }
@@ -947,14 +975,15 @@
     }
     .item-price-input {
       flex: 1;
-      padding: 0.38rem 0.6rem 0.38rem 0.3rem;
+      padding: 0.55rem 0.7rem 0.55rem 0.3rem;
       border: 1.5px solid var(--border-2);
       border-radius: 6px;
       background: #fffdf8;
-      font-size: 0.92rem;
+      font-size: 1rem;
       font-family: inherit;
       color: var(--text);
       min-width: 0;
+      min-height: 44px;
     }
     .item-price-input:focus {
       outline: none;
@@ -973,10 +1002,11 @@
       background: none;
       border: none;
       color: var(--text-muted);
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       font-family: inherit;
       line-height: 1;
-      padding: 0.25rem 0.5rem;
+      padding: 0.5rem 0.75rem;
+      min-height: 44px;
       cursor: pointer;
       border-radius: 4px;
       opacity: 0.7;
@@ -986,18 +1016,47 @@
     .item-remove:hover { color: #c0392b; opacity: 1; }
     .item-link-input {
       width: 100%;
-      padding: 0.35rem 0.6rem;
+      padding: 0.55rem 0.65rem;
       border: 1.5px solid var(--border-2);
       border-radius: 6px;
       background: #fffdf8;
-      font-size: 0.84rem;
+      font-size: 1rem;
       font-family: inherit;
       color: var(--text);
+      min-height: 44px;
     }
     .item-link-input:focus {
       outline: none; border-color: var(--gold);
       box-shadow: 0 0 0 2px rgba(200,149,42,0.15);
     }
+    /* Details bar: price + link toggle side by side */
+    .item-details-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .item-details-bar .item-price-wrap {
+      flex: 1;
+    }
+    /* Link toggle button */
+    .btn-toggle-link {
+      background: none;
+      border: 1.5px solid var(--border-2);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-family: inherit;
+      padding: 0.4rem 0.75rem;
+      min-height: 44px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-toggle-link.active {
+      border-color: var(--gold);
+      color: var(--gold-dark);
+    }
+    .btn-toggle-link:hover { border-color: var(--gold); color: var(--gold-dark); }
     /* Link preview card */
     .link-preview-loading { font-size: 0.78rem; color: #b09060; font-style: italic; padding: 0.25rem 0; }
     .link-preview-card {
@@ -1149,8 +1208,9 @@
       color: var(--gold-dark);
       border: 1.5px dashed rgba(200,149,42,0.45);
       border-radius: 7px;
-      font-size: 0.85rem;
-      padding: 0.4rem 0.9rem;
+      font-size: 0.9rem;
+      padding: 0.65rem 0.9rem;
+      min-height: 48px;
       width: 100%;
       margin-bottom: 0.8rem;
       transition: background 0.15s, border-color 0.15s;
@@ -1458,6 +1518,12 @@
     <!-- Preview -->
     <div class="preview-box" id="ob-preview"></div>
 
+    <div class="ob-reminder-row">
+      <label class="ob-reminder-label">
+        <input type="checkbox" id="ob_reminder_opt_in" checked />
+        Send me a daily reminder email at 8:00 AM
+      </label>
+    </div>
     <div class="start-btn-wrap">
       <button class="btn-start" onclick="startGame()">Start My Game</button>
     </div>
@@ -1927,12 +1993,15 @@
     if (!start_date) { alert('Please pick a start date.'); return; }
     if (!start_amount || start_amount < 1) { alert('Please enter a valid starting amount.'); return; }
 
+    const reminderOptIn = document.getElementById('ob_reminder_opt_in').checked;
     const payload = {
       game_mode: obMode,
       start_amount,
       start_date,
       custom_type: obCustomType,
-      custom_step: obMode === 'custom' ? custom_step : null
+      custom_step: obMode === 'custom' ? custom_step : null,
+      reminder_email: reminderOptIn ? getEmail() : null,
+      reminder_time: '08:00'
     };
 
     await authFetch('/api/settings', { method: 'POST', body: JSON.stringify(payload) });
@@ -1990,7 +2059,9 @@
 
     const todayEntry = entries[todayDayNumber];
     const parsed = todayEntry ? parseItems(todayEntry) : [];
-    todayItems = parsed.length > 0 ? parsed : [{ desc: '', price: '', link: '' }];
+    todayItems = parsed.length > 0
+      ? parsed.map(it => ({ ...it, showLink: !!it.link }))
+      : [{ desc: '', price: '', link: '', showLink: false }];
     linkPreviews = {};
     renderItems();
     updateRemaining();
@@ -2024,7 +2095,7 @@
   }
 
   function addItem() {
-    todayItems.push({ desc: '', price: '', link: '' });
+    todayItems.push({ desc: '', price: '', link: '', showLink: false });
     markDirty();
     renderItems();
     const rows = document.querySelectorAll('.item-card');
@@ -2106,6 +2177,20 @@
     el.classList.toggle('show', len > 0 && len < 150);
   }
 
+  function autoGrow(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+
+  function toggleLink(idx) {
+    todayItems[idx].showLink = !todayItems[idx].showLink;
+    renderItems();
+    if (todayItems[idx].showLink) {
+      const card = document.querySelectorAll('.item-card')[idx];
+      if (card) card.querySelector('.item-link-input').focus();
+    }
+  }
+
   function updateRemaining() {
     const el = document.getElementById('today-remaining');
     if (!el || !todayDayNumber) return;
@@ -2185,21 +2270,28 @@
       } else if (preview && preview._url === item.link && (preview.title || preview.image)) {
         previewHtml = buildPreviewCardHtml(preview, item.link);
       }
+      const showLink = item.showLink || !!item.link;
       return `
         <div class="item-card" data-index="${i}">
           <div class="item-inputs">
             <div class="desc-field-wrap">
               <textarea class="item-desc-input" rows="3" placeholder="How will you spend this prosperity to bring you joy? Describe the details of what you'll get and how you'll feel while experiencing it…"
-                oninput="todayItems[${i}].desc=this.value;checkDescHint(${i},this.value.length);markDirty()">${escHtml(item.desc)}</textarea>
+                oninput="todayItems[${i}].desc=this.value;checkDescHint(${i},this.value.length);markDirty();autoGrow(this)">${escHtml(item.desc)}</textarea>
               <div class="desc-hint${item.desc.length > 0 && item.desc.length < 150 ? ' show' : ''}" id="desc-hint-${i}">Keep going. The details are what bring this to life! 💖</div>
             </div>
-            <div class="item-price-wrap">
-              <span class="price-currency">$</span>
-              <input type="number" class="item-price-input" placeholder="0.00" step="0.01" min="0"
-                value="${item.price !== '' ? escHtml(String(item.price)) : ''}"
-                oninput="todayItems[${i}].price=this.value;updateRemaining();markDirty()">
+            <div class="item-details-bar">
+              <div class="item-price-wrap">
+                <span class="price-currency">$</span>
+                <input type="number" class="item-price-input" inputmode="decimal" placeholder="0.00" step="0.01" min="0"
+                  value="${item.price !== '' ? escHtml(String(item.price)) : ''}"
+                  oninput="todayItems[${i}].price=this.value;updateRemaining();markDirty()">
+              </div>
+              <button type="button" class="btn-toggle-link${showLink ? ' active' : ''}" onclick="toggleLink(${i})">
+                ${showLink ? '🔗 Link' : '+ Link'}
+              </button>
             </div>
-            <input type="url" class="item-link-input" placeholder="Link (optional)"
+            <input type="url" class="item-link-input" inputmode="url" placeholder="Paste a link (optional)"
+              style="${showLink ? '' : 'display:none'}"
               value="${escHtml(item.link)}"
               oninput="todayItems[${i}].link=this.value;markDirty()"
               onblur="fetchItemPreview(${i})">
@@ -2210,7 +2302,7 @@
                 <button class="btn-save-inline${isDirty ? ' dirty' : ''}" id="btn-save-entry" onclick="saveToday()">Save Entry</button>
                 <span id="today-saved" class="saved-badge">Saved!</span>
               </div>` : '<div></div>'}
-              <button class="item-remove" onclick="removeItem(${i})">🗑 Remove item</button>
+              <button class="item-remove" onclick="removeItem(${i})">🗑 Remove</button>
             </div>
           </div>
         </div>`;

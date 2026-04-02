@@ -152,6 +152,7 @@ app.get('/api/settings', requireAuth, (req, res) => {
 
 app.post('/api/settings', requireAuth, (req, res) => {
   const { game_mode, start_amount, start_date, custom_type, custom_step, reminder_email, reminder_time } = req.body;
+  const isNew = !db.prepare('SELECT id FROM user_settings WHERE user_id = ?').get(req.userId);
   db.prepare(`
     INSERT INTO user_settings (user_id, game_mode, start_amount, start_date, custom_type, custom_step, reminder_email, reminder_time)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -168,6 +169,15 @@ app.post('/api/settings', requireAuth, (req, res) => {
     custom_type ?? 'add', custom_step ?? null,
     reminder_email ?? null, reminder_time ?? '08:00'
   );
+  // Send day 1 reminder immediately for new users who opted into emails
+  if (isNew && reminder_email) {
+    const s = db.prepare('SELECT * FROM user_settings WHERE user_id = ?').get(req.userId);
+    const dayNum = calcDayNumber(s);
+    const amount = calcDepositAmount(s, Math.max(dayNum, 1));
+    sendReminderEmail(reminder_email, Math.max(dayNum, 1), amount)
+      .then(() => console.log(`Welcome reminder sent to ${reminder_email}`))
+      .catch(err => console.error(`Welcome reminder failed for ${reminder_email}:`, err.message));
+  }
   res.json({ ok: true });
 });
 
@@ -254,7 +264,26 @@ app.post('/api/send-test-email', requireAuth, async (req, res) => {
   }
 });
 
-// ---- Reset (user-scoped) ----
+// ---- Admin metrics ----
+app.get('/api/admin/metrics', (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  res.json({
+    total_users:          db.prepare('SELECT COUNT(*) as n FROM users').get().n,
+    users_started:        db.prepare('SELECT COUNT(*) as n FROM user_settings').get().n,
+    total_entries:        db.prepare('SELECT COUNT(*) as n FROM user_entries').get().n,
+    entries_today:        db.prepare("SELECT COUNT(*) as n FROM user_entries WHERE date(created_at) = date('now')").get().n,
+    entries_last_7d:      db.prepare("SELECT COUNT(*) as n FROM user_entries WHERE created_at >= datetime('now', '-7 days')").get().n,
+    entries_last_30d:     db.prepare("SELECT COUNT(*) as n FROM user_entries WHERE created_at >= datetime('now', '-30 days')").get().n,
+    dau:                  db.prepare("SELECT COUNT(DISTINCT user_id) as n FROM user_entries WHERE date(created_at) = date('now')").get().n,
+    users_with_reminders: db.prepare('SELECT COUNT(*) as n FROM user_settings WHERE reminder_email IS NOT NULL').get().n,
+    signups_last_7d:      db.prepare("SELECT COUNT(*) as n FROM users WHERE created_at >= datetime('now', '-7 days')").get().n,
+  });
+});
+
+
 app.delete('/api/reset', requireAuth, (req, res) => {
   db.prepare('DELETE FROM user_settings WHERE user_id = ?').run(req.userId);
   db.prepare('DELETE FROM user_entries WHERE user_id = ?').run(req.userId);

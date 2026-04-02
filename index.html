@@ -310,6 +310,7 @@
 
     /* ===================== GAME VIEW ===================== */
     #game { display: none; }
+    #bmc-widget { display: none; }
 
     /* ---- Login screen ---- */
     #login-screen {
@@ -1108,6 +1109,41 @@
     }
     .prosperity-quote.show { opacity: 1; }
 
+    /* ---- Closed-out celebration state ---- */
+    .closed-out-state {
+      display: none;
+      text-align: center;
+      padding: 2rem 1rem 1.5rem;
+      animation: closedOutReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .closed-out-state.visible { display: block; }
+    @keyframes closedOutReveal {
+      from { opacity: 0; transform: translateY(18px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0)    scale(1); }
+    }
+    .closed-out-icon {
+      font-size: 2.6rem;
+      margin-bottom: 0.6rem;
+      display: block;
+      animation: closedOutBounce 0.6s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes closedOutBounce {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .closed-out-headline {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: var(--brown);
+      margin-bottom: 0.4rem;
+    }
+    .closed-out-sub {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
     .btn-add-item {
       background: none;
       color: var(--gold-dark);
@@ -1580,6 +1616,11 @@
       <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
       <div id="items-container"></div>
       <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
+      <div class="closed-out-state" id="closed-out-state">
+        <span class="closed-out-icon">🌟</span>
+        <div class="closed-out-headline">Congratulations!</div>
+        <div class="closed-out-sub">You've enjoyed the Universe's abundance today.</div>
+      </div>
     </div>
     <div id="prosperity-quote" class="prosperity-quote"></div>
     </div><!-- end today-spend-area -->
@@ -1648,6 +1689,7 @@
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('onboarding').style.display   = 'none';
     document.getElementById('game').style.display         = 'none';
+    const w = document.getElementById('bmc-widget'); if (w) w.style.display = 'none';
   }
 
   function showLoginForm() {
@@ -1736,27 +1778,10 @@
     await loadApp();
   }
 
-  function loadBMCWidget() {
-    if (document.getElementById('bmc-widget-script')) return;
-    const s = document.createElement('script');
-    s.id = 'bmc-widget-script';
-    s.setAttribute('data-name', 'BMC-Widget');
-    s.setAttribute('data-cfasync', 'false');
-    s.setAttribute('data-id', 'colinbovet');
-    s.setAttribute('data-description', 'Support me on Buy me a coffee!');
-    s.setAttribute('data-message', 'Love the game? Buy me a coffee! ☕️');
-    s.setAttribute('data-color', '#FF813F');
-    s.setAttribute('data-position', 'Right');
-    s.setAttribute('data-x_margin', '18');
-    s.setAttribute('data-y_margin', '18');
-    s.src = 'https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js';
-    document.body.appendChild(s);
-  }
-
   async function loadApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('ob_start_date').value        = todayISO();
-    loadBMCWidget();
+    const w = document.getElementById('bmc-widget'); if (w) w.style.display = '';
 
     const [s, e] = await Promise.all([
       authFetch('/api/settings').then(r => r.ok ? r.json() : null),
@@ -2458,6 +2483,30 @@
       entryArea.addEventListener('animationend', () => entryArea.classList.remove('entry-saved'), { once: true });
     }
     spawnSaveParticles();
+
+    // Show closed-out celebration if fully spent
+    const deposit = amountForDay(todayDayNumber);
+    const total = items.reduce((s, it) => s + (parseFloat(it.price) || 0), 0);
+    if (total > 0 && Math.abs(deposit - total) < 0.005) {
+      showClosedOut();
+    }
+  }
+
+  function showClosedOut() {
+    const state = document.getElementById('closed-out-state');
+    const container = document.getElementById('items-container');
+    const addBtn = document.querySelector('.btn-add-item');
+    const label = document.querySelector('.items-entry-label');
+    const prompt = document.querySelector('.today-prompt');
+    if (!state) return;
+    // Fade out the entry UI, then reveal the celebration
+    [container, addBtn, label, prompt].forEach(el => {
+      if (el) { el.style.transition = 'opacity 0.4s'; el.style.opacity = '0'; }
+    });
+    setTimeout(() => {
+      [container, addBtn, label, prompt].forEach(el => { if (el) el.style.display = 'none'; });
+      state.classList.add('visible');
+    }, 420);
   }
 
   function showProsperityQuote() {
@@ -2493,5 +2542,6 @@
   // ---- Boot ----
   init();
 </script>
+<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="colinbovet" data-description="Support me on Buy me a coffee!" data-message="Love the game? Buy me a coffee! ☕️" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 </body>
 </html>

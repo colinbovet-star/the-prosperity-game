@@ -2165,12 +2165,12 @@
               onblur="fetchItemPreview(${i})">
             <div id="item-preview-${i}">${previewHtml}</div>
             <div class="item-remove-row">
-              <button class="item-remove" onclick="removeItem(${i})">🗑 Remove item</button>
               ${i === todayItems.length - 1 ? `
               <div class="item-save-group">
-                <span id="today-saved" class="saved-badge">Saved!</span>
                 <button class="btn-save-inline${isDirty ? ' dirty' : ''}" id="btn-save-entry" onclick="saveToday()">Save Entry</button>
-              </div>` : ''}
+                <span id="today-saved" class="saved-badge">Saved!</span>
+              </div>` : '<div></div>'}
+              <button class="item-remove" onclick="removeItem(${i})">🗑 Remove item</button>
             </div>
           </div>
         </div>`;

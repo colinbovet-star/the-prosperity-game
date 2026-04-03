@@ -2512,9 +2512,6 @@
   function renderItems() {
     const container = document.getElementById('items-container');
     if (!container) return;
-    container.style.display = '';
-    container.style.opacity = '';
-    container.style.transition = '';
     container.innerHTML = todayItems.map((item, i) => {
       const preview = linkPreviews[i];
       let previewHtml = '';
@@ -2835,21 +2832,13 @@
     }
     spawnSaveParticles();
 
-    // Collapse item cards and pulse the add button
-    const itemsContainer = document.getElementById('items-container');
-    if (itemsContainer) {
-      itemsContainer.style.transition = 'opacity 0.3s';
-      itemsContainer.style.opacity = '0';
-      setTimeout(() => { itemsContainer.style.display = 'none'; }, 320);
-    }
+    // Pulse the add button after saving
     const addBtn = document.querySelector('.btn-add-item');
     if (addBtn) {
-      setTimeout(() => {
-        addBtn.classList.remove('pulse');
-        void addBtn.offsetWidth;
-        addBtn.classList.add('pulse');
-        addBtn.addEventListener('animationend', () => addBtn.classList.remove('pulse'), { once: true });
-      }, 350);
+      addBtn.classList.remove('pulse');
+      void addBtn.offsetWidth;
+      addBtn.classList.add('pulse');
+      addBtn.addEventListener('animationend', () => addBtn.classList.remove('pulse'), { once: true });
     }
 
     // Show closed-out celebration if fully spent

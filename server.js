@@ -212,6 +212,11 @@ app.post('/api/entries', requireAuth, (req, res) => {
   res.json(row);
 });
 
+app.delete('/api/entries/:day', requireAuth, (req, res) => {
+  db.prepare('DELETE FROM user_entries WHERE user_id = ? AND day_number = ?').run(req.userId, req.params.day);
+  res.json({ ok: true });
+});
+
 // ---- Pageview tracking ----
 app.post('/api/pageview', (req, res) => {
   let userId = null;

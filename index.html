@@ -2345,9 +2345,17 @@
       else if (ki > idx) shifted[ki - 1] = v;
     });
     linkPreviews = shifted;
-    markDirty();
     renderItems();
     updateRemaining();
+    if (todayItems.length === 0) {
+      authFetch(`/api/entries/${activeDayNumber}`, { method: 'DELETE' }).then(() => {
+        delete entries[activeDayNumber];
+        clearDirty();
+        renderHistory();
+      });
+    } else {
+      saveToday();
+    }
   }
 
   function collectItems() {

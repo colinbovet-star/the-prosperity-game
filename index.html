@@ -594,15 +594,6 @@
       .stats-bar .stat-total { grid-column: span 2; }
     }
     @media (max-width: 480px) {
-      .today-spend-area {
-        padding: 1.1rem 0.65rem 1.3rem;
-      }
-      .items-entry-area {
-        padding: 0.9rem 0.7rem 0.85rem;
-      }
-      .item-card {
-        padding: 0.6rem 0.55rem 0.55rem;
-      }
       .btn-save-inline { width: 100%; }
       .item-save-group { width: 100%; }
       .item-remove-row { flex-direction: column-reverse; gap: 0.5rem; }
@@ -783,9 +774,8 @@
       background: linear-gradient(150deg, #fffcf2 0%, #fff8e8 100%);
     }
     .today-remaining {
-      font-size: 0.82rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
-      margin-bottom: 0.75rem;
     }
     .today-divider {
       border: none;
@@ -886,6 +876,15 @@
       flex: 1;
       height: 1px;
       background: rgba(200,149,42,0.22);
+      order: 1;
+    }
+    .items-entry-label .today-remaining {
+      order: 2;
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-top: 0;
     }
 
     /* ---- Spending items ---- */
@@ -950,7 +949,7 @@
       border: none;
       border-radius: 6px;
       background: transparent;
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-family: Georgia, serif;
       color: var(--text);
       resize: none;
@@ -958,6 +957,12 @@
       min-height: 80px;
       line-height: 1.5;
       display: block;
+    }
+    .item-desc-input::placeholder,
+    .item-desc-input::-webkit-input-placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.82rem;
     }
     .item-desc-input:focus { outline: none; }
     .item-price-wrap {
@@ -1151,7 +1156,6 @@
     .today-remaining {
       font-size: 0.82rem;
       color: var(--text-muted);
-      margin-top: 0.3rem;
     }
     .today-remaining .rem-amount { font-weight: bold; color: var(--brown); }
     .today-remaining .rem-amount.over { color: #c0392b; }
@@ -1415,9 +1419,26 @@
 
     /* ---- Responsive tweaks ---- */
     @media (max-width: 420px) {
-      body { padding: 1.5rem 0.75rem 3rem; }
-      .today-card { padding: 1.5rem 1.2rem 1.3rem; }
+      body { padding: 1.5rem 0.5rem 3rem; }
+      .today-card { padding: 1.5rem 0.5rem 1.3rem; }
       .dc-hero { height: 160px; }
+      .today-spend-area { padding: 1.1rem 0 1.3rem; }
+      .items-entry-area {
+        padding: 0.85rem 0.75rem 0.85rem;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+      }
+      .item-card {
+        padding: 0.55rem 0.5rem 0.5rem;
+        border-radius: 6px;
+      }
+      .item-desc-input {
+        font-size: 0.875rem;
+      }
     }
   </style>
 </head>
@@ -1623,7 +1644,6 @@
 
     <!-- Spending area -->
     <div class="today-spend-area">
-      <div class="today-remaining" id="today-remaining" style="display:none"></div>
       <hr class="today-divider" />
 
     <!-- Inspiration section -->
@@ -1662,7 +1682,7 @@
 
     <div class="items-entry-area" id="items-entry-area">
       <div class="deposit-particles" id="save-particles"></div>
-      <div class="items-entry-label">✍️ Your spending entry</div>
+      <div class="items-entry-label">✍️ Today's Spending<div class="today-remaining" id="today-remaining" style="display:none"></div></div>
       <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
       <div id="items-container"></div>
       <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>

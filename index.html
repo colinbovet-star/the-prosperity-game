@@ -790,6 +790,7 @@
     }
     /* ---- Inspiration section ---- */
     .inspiration-section {
+      margin-top: 1.2rem;
       margin-bottom: 1.1rem;
     }
     .inspiration-toggle {
@@ -1417,10 +1418,161 @@
     @keyframes fadeIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
 
+    /* ===================== ADMIN DASHBOARD ===================== */
+    #admin-panel {
+      min-height: 100vh;
+      background: #1a1612;
+      color: #e8d9b0;
+      padding: 0;
+    }
+    .admin-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+    .admin-header {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .admin-header h1 {
+      font-size: 1.5rem;
+      color: var(--gold-light);
+      margin: 0;
+      letter-spacing: -0.01em;
+      flex: 1;
+    }
+    .admin-tab-group {
+      display: flex;
+      background: rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .admin-tab {
+      background: none;
+      border: none;
+      color: #a09070;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .admin-tab.active {
+      background: var(--gold);
+      color: #fff;
+      font-weight: bold;
+    }
+    .admin-refresh {
+      background: rgba(200,149,42,0.15);
+      border: 1px solid rgba(200,149,42,0.3);
+      color: var(--gold-light);
+      padding: 0.4rem 0.9rem;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .admin-refresh:hover { background: rgba(200,149,42,0.25); }
+    .admin-totals {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 600px) { .admin-totals { grid-template-columns: repeat(2, 1fr); } }
+    .admin-total-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(200,149,42,0.2);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+    .admin-total-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #806040;
+      margin-bottom: 0.3rem;
+    }
+    .admin-total-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+    .admin-charts {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+    @media (max-width: 640px) { .admin-charts { grid-template-columns: 1fr; } }
+    .admin-chart-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(200,149,42,0.15);
+      border-radius: 10px;
+      padding: 1.2rem;
+    }
+    .admin-chart-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9a7840;
+      margin-bottom: 0.3rem;
+    }
+    .admin-chart-peak {
+      font-size: 0.72rem;
+      color: #60503a;
+      margin-bottom: 0.8rem;
+    }
+    .admin-chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 80px;
+    }
+    .admin-bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+    }
+    .admin-bar {
+      width: 100%;
+      background: linear-gradient(to top, #c8952a, #e6b84a);
+      border-radius: 2px 2px 0 0;
+      min-height: 1px;
+    }
+    .admin-chart-axis {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.62rem;
+      color: #504030;
+      margin-top: 4px;
+    }
+    .admin-loading {
+      text-align: center;
+      color: #604030;
+      padding: 3rem;
+      font-size: 0.9rem;
+    }
+    .admin-error {
+      text-align: center;
+      color: #c05030;
+      padding: 3rem;
+      font-size: 0.9rem;
+    }
+
     /* ---- Responsive tweaks ---- */
     @media (max-width: 420px) {
       body { padding: 1.5rem 0.5rem 3rem; }
-      .today-card { padding: 1.5rem 0.5rem 1.3rem; }
+      .today-card { padding: 0; }
       .dc-hero { height: 160px; }
       .today-spend-area { padding: 1.1rem 0 1.3rem; }
       .items-entry-area {
@@ -1443,6 +1595,23 @@
   </style>
 </head>
 <body>
+
+<!-- ===================== ADMIN DASHBOARD ===================== -->
+<div id="admin-panel" style="display:none">
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <h1>✨ Admin Dashboard</h1>
+      <div class="admin-tab-group">
+        <button class="admin-tab active" id="tab-hourly" onclick="adminSwitchTab('hourly')">Hourly (24h)</button>
+        <button class="admin-tab" id="tab-daily" onclick="adminSwitchTab('daily')">Daily (30d)</button>
+      </div>
+      <button class="admin-refresh" onclick="adminLoad()">↻ Refresh</button>
+    </div>
+    <div id="admin-content">
+      <div class="admin-loading">Loading…</div>
+    </div>
+  </div>
+</div>
 
 <!-- ===================== LOGIN SCREEN ===================== -->
 <div id="login-screen" style="display:none">
@@ -1646,6 +1815,19 @@
     <div class="today-spend-area">
       <hr class="today-divider" />
 
+    <div class="items-entry-area" id="items-entry-area">
+      <div class="deposit-particles" id="save-particles"></div>
+      <div class="items-entry-label">✍️ Today's Spending<div class="today-remaining" id="today-remaining" style="display:none"></div></div>
+      <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
+      <div id="items-container"></div>
+      <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
+      <div class="closed-out-state" id="closed-out-state">
+        <span class="closed-out-icon">🌟</span>
+        <div class="closed-out-headline">Congratulations!</div>
+        <div class="closed-out-sub">You've enjoyed the Universe's abundance today.</div>
+      </div>
+    </div>
+
     <!-- Inspiration section -->
     <div class="inspiration-section">
       <button class="inspiration-toggle open" onclick="toggleInspiration(this)">
@@ -1672,26 +1854,10 @@
           <div class="inspo-title">Generosity</div>
           <div class="inspo-desc">Spend on people or causes you love. Generosity flows the energy forward.</div>
         </div>
-        <div class="inspo-card">
-          <div class="inspo-icon">🌱</div>
-          <div class="inspo-title">Go General First</div>
-          <div class="inspo-desc">If details bring resistance, stay broad: "a luxury car." Get specific as you grow comfortable.</div>
-        </div>
+
       </div>
     </div>
 
-    <div class="items-entry-area" id="items-entry-area">
-      <div class="deposit-particles" id="save-particles"></div>
-      <div class="items-entry-label">✍️ Today's Spending<div class="today-remaining" id="today-remaining" style="display:none"></div></div>
-      <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
-      <div id="items-container"></div>
-      <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
-      <div class="closed-out-state" id="closed-out-state">
-        <span class="closed-out-icon">🌟</span>
-        <div class="closed-out-headline">Congratulations!</div>
-        <div class="closed-out-sub">You've enjoyed the Universe's abundance today.</div>
-      </div>
-    </div>
     <div id="prosperity-quote" class="prosperity-quote"></div>
     </div><!-- end today-spend-area -->
   </div>
@@ -1829,6 +1995,22 @@
     // Check for magic link token in URL
     const params     = new URLSearchParams(window.location.search);
     const magicToken = params.get('token');
+    const adminKey   = params.get('admin');
+
+    // Admin dashboard
+    if (adminKey) {
+      window.history.replaceState({}, '', '/');
+      _adminKey = adminKey;
+      document.getElementById('admin-panel').style.display = 'block';
+      await adminLoad();
+      return;
+    }
+
+    // Track pageview (fire-and-forget)
+    fetch('/api/pageview', {
+      method: 'POST',
+      headers: getJwt() ? { Authorization: `Bearer ${getJwt()}` } : {}
+    }).catch(() => {});
 
     if (magicToken) {
       document.getElementById('login-screen').style.display = 'flex';
@@ -2690,8 +2872,112 @@
     showOnboarding();
   }
 
+  // ---- Admin Dashboard ----
+  let _adminKey = null;
+  let _adminTab = 'hourly';
+  let _adminData = null;
+
   // ---- Boot ----
   init();
+
+  function adminSwitchTab(tab) {
+    _adminTab = tab;
+    document.getElementById('tab-hourly').classList.toggle('active', tab === 'hourly');
+    document.getElementById('tab-daily').classList.toggle('active', tab === 'daily');
+    if (_adminData) adminRender(_adminData);
+  }
+
+  async function adminLoad() {
+    document.getElementById('admin-content').innerHTML = '<div class="admin-loading">Loading…</div>';
+    try {
+      const r = await fetch('/api/admin/dashboard', { headers: { 'X-Admin-Key': _adminKey } });
+      if (!r.ok) throw new Error('Unauthorized or server error');
+      _adminData = await r.json();
+      adminRender(_adminData);
+    } catch (err) {
+      document.getElementById('admin-content').innerHTML = `<div class="admin-error">Error: ${err.message}</div>`;
+    }
+  }
+
+  function adminRender(data) {
+    const t = data.totals;
+    const rows = _adminTab === 'hourly' ? adminFillHourly(data.hourly) : adminFillDaily(data.daily);
+
+    const totalsHtml = `
+      <div class="admin-totals">
+        ${adminTotalCard('Pageviews', t.pageviews)}
+        ${adminTotalCard('Users Signed Up', t.signups)}
+        ${adminTotalCard('Entries Saved', t.entries)}
+        ${adminTotalCard('Repeat Visits', t.repeat_visits)}
+      </div>`;
+
+    const chartsHtml = `
+      <div class="admin-charts">
+        ${adminChartCard('Pageviews', rows, 'pageviews')}
+        ${adminChartCard('Users Signed Up', rows, 'signups')}
+        ${adminChartCard('Entries Saved', rows, 'entries')}
+        ${adminChartCard('Repeat Visits', rows, 'repeat_visits')}
+      </div>`;
+
+    document.getElementById('admin-content').innerHTML = totalsHtml + chartsHtml;
+  }
+
+  function adminTotalCard(label, value) {
+    return `<div class="admin-total-card"><div class="admin-total-label">${label}</div><div class="admin-total-value">${value.toLocaleString()}</div></div>`;
+  }
+
+  function adminChartCard(title, rows, key) {
+    const values = rows.map(r => r[key]);
+    const max = Math.max(...values, 1);
+    const total = values.reduce((s, v) => s + v, 0);
+    const peak = Math.max(...values);
+    const firstLabel = rows.length ? rows[0].label : '';
+    const lastLabel = rows.length ? rows[rows.length - 1].label : '';
+
+    const bars = rows.map(r => {
+      const h = Math.round((r[key] / max) * 80);
+      return `<div class="admin-bar-col"><div class="admin-bar" style="height:${h}px" title="${r.label}: ${r[key]}"></div></div>`;
+    }).join('');
+
+    return `<div class="admin-chart-card">
+      <div class="admin-chart-title">${title}</div>
+      <div class="admin-chart-peak">Total: ${total.toLocaleString()} · Peak: ${peak.toLocaleString()}</div>
+      <div class="admin-chart-bars">${bars}</div>
+      <div class="admin-chart-axis"><span>${firstLabel}</span><span>${lastLabel}</span></div>
+    </div>`;
+  }
+
+  function adminFillHourly(sparse) {
+    const byT = {};
+    for (const r of sparse) byT[r.t] = r;
+    const result = [];
+    const now = new Date();
+    for (let i = 23; i >= 0; i--) {
+      const d = new Date(now);
+      d.setHours(d.getHours() - i, 0, 0, 0);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:00`;
+      const label = String(d.getHours()).padStart(2,'0') + ':00';
+      const r = byT[key] || {};
+      result.push({ t: key, label, pageviews: r.pageviews||0, signups: r.signups||0, entries: r.entries||0, repeat_visits: r.repeat_visits||0 });
+    }
+    return result;
+  }
+
+  function adminFillDaily(sparse) {
+    const byT = {};
+    for (const r of sparse) byT[r.t] = r;
+    const result = [];
+    const now = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const label = `${d.getMonth()+1}/${d.getDate()}`;
+      const r = byT[key] || {};
+      result.push({ t: key, label, pageviews: r.pageviews||0, signups: r.signups||0, entries: r.entries||0, repeat_visits: r.repeat_visits||0 });
+    }
+    return result;
+  }
 </script>
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="colinbovet" data-description="Support me on Buy me a coffee!" data-message="Love the game? Buy me a coffee! ☕️" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 </body>

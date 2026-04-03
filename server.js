@@ -63,6 +63,12 @@ db.exec(`
     created_at     TEXT    NOT NULL DEFAULT (datetime('now')),
     UNIQUE(user_id, day_number)
   );
+
+  CREATE TABLE IF NOT EXISTS pageviews (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER REFERENCES users(id),
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 app.use(express.json());
@@ -206,6 +212,20 @@ app.post('/api/entries', requireAuth, (req, res) => {
   res.json(row);
 });
 
+// ---- Pageview tracking ----
+app.post('/api/pageview', (req, res) => {
+  let userId = null;
+  const auth = req.headers.authorization;
+  if (auth && auth.startsWith('Bearer ')) {
+    try {
+      const payload = jwt.verify(auth.slice(7), JWT_SECRET);
+      userId = payload.userId;
+    } catch (_) { /* invalid/expired JWT — treat as anonymous */ }
+  }
+  db.prepare('INSERT INTO pageviews (user_id) VALUES (?)').run(userId);
+  res.json({ ok: true });
+});
+
 // ---- Link preview (no auth — utility endpoint) ----
 app.get('/api/link-preview', async (req, res) => {
   const { url } = req.query;
@@ -283,6 +303,51 @@ app.get('/api/admin/metrics', (req, res) => {
   });
 });
 
+
+// ---- Admin dashboard (hourly + daily breakdowns) ----
+app.get('/api/admin/dashboard', (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  function mergeRows(pvRows, signupRows, entryRows, field) {
+    const map = {};
+    for (const r of pvRows) {
+      map[r.t] = map[r.t] || { t: r.t, pageviews: 0, signups: 0, entries: 0, repeat_visits: 0 };
+      map[r.t].pageviews = r.pageviews;
+      map[r.t].repeat_visits = r.repeat_visits;
+    }
+    for (const r of signupRows) {
+      map[r.t] = map[r.t] || { t: r.t, pageviews: 0, signups: 0, entries: 0, repeat_visits: 0 };
+      map[r.t].signups = r.n;
+    }
+    for (const r of entryRows) {
+      map[r.t] = map[r.t] || { t: r.t, pageviews: 0, signups: 0, entries: 0, repeat_visits: 0 };
+      map[r.t].entries = r.n;
+    }
+    return Object.values(map).sort((a, b) => a.t.localeCompare(b.t));
+  }
+
+  const hourlyPv      = db.prepare(`SELECT strftime('%Y-%m-%dT%H:00', created_at, 'localtime') as t, COUNT(*) as pageviews, COUNT(user_id) as repeat_visits FROM pageviews WHERE created_at >= datetime('now', '-24 hours') GROUP BY t ORDER BY t ASC`).all();
+  const hourlySignups = db.prepare(`SELECT strftime('%Y-%m-%dT%H:00', created_at, 'localtime') as t, COUNT(*) as n FROM users WHERE created_at >= datetime('now', '-24 hours') GROUP BY t ORDER BY t ASC`).all();
+  const hourlyEntries = db.prepare(`SELECT strftime('%Y-%m-%dT%H:00', created_at, 'localtime') as t, COUNT(*) as n FROM user_entries WHERE created_at >= datetime('now', '-24 hours') GROUP BY t ORDER BY t ASC`).all();
+
+  const dailyPv      = db.prepare(`SELECT date(created_at, 'localtime') as t, COUNT(*) as pageviews, COUNT(user_id) as repeat_visits FROM pageviews WHERE created_at >= datetime('now', '-30 days') GROUP BY t ORDER BY t ASC`).all();
+  const dailySignups = db.prepare(`SELECT date(created_at, 'localtime') as t, COUNT(*) as n FROM users WHERE created_at >= datetime('now', '-30 days') GROUP BY t ORDER BY t ASC`).all();
+  const dailyEntries = db.prepare(`SELECT date(created_at, 'localtime') as t, COUNT(*) as n FROM user_entries WHERE created_at >= datetime('now', '-30 days') GROUP BY t ORDER BY t ASC`).all();
+
+  res.json({
+    totals: {
+      pageviews:     db.prepare('SELECT COUNT(*) as n FROM pageviews').get().n,
+      signups:       db.prepare('SELECT COUNT(*) as n FROM users').get().n,
+      entries:       db.prepare('SELECT COUNT(*) as n FROM user_entries').get().n,
+      repeat_visits: db.prepare('SELECT COUNT(*) as n FROM pageviews WHERE user_id IS NOT NULL').get().n,
+    },
+    hourly: mergeRows(hourlyPv, hourlySignups, hourlyEntries),
+    daily:  mergeRows(dailyPv,  dailySignups,  dailyEntries),
+  });
+});
 
 app.delete('/api/reset', requireAuth, (req, res) => {
   db.prepare('DELETE FROM user_settings WHERE user_id = ?').run(req.userId);

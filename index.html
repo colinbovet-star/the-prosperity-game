@@ -767,6 +767,14 @@
     .items-entry-area.entry-saved {
       animation: entryGlow 0.9s ease-in-out 2;
     }
+    @keyframes addBtnPulse {
+      0%   { background: rgba(200,149,42,0.0); border-color: rgba(200,149,42,0.35); }
+      40%  { background: rgba(200,149,42,0.13); border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,149,42,0.18); }
+      100% { background: rgba(200,149,42,0.0); border-color: rgba(200,149,42,0.35); box-shadow: none; }
+    }
+    .btn-add-item.pulse {
+      animation: addBtnPulse 1.1s ease-out 2;
+    }
 
     /* Spending area */
     .today-spend-area {
@@ -2504,6 +2512,9 @@
   function renderItems() {
     const container = document.getElementById('items-container');
     if (!container) return;
+    container.style.display = '';
+    container.style.opacity = '';
+    container.style.transition = '';
     container.innerHTML = todayItems.map((item, i) => {
       const preview = linkPreviews[i];
       let previewHtml = '';
@@ -2823,6 +2834,23 @@
       entryArea.addEventListener('animationend', () => entryArea.classList.remove('entry-saved'), { once: true });
     }
     spawnSaveParticles();
+
+    // Collapse item cards and pulse the add button
+    const itemsContainer = document.getElementById('items-container');
+    if (itemsContainer) {
+      itemsContainer.style.transition = 'opacity 0.3s';
+      itemsContainer.style.opacity = '0';
+      setTimeout(() => { itemsContainer.style.display = 'none'; }, 320);
+    }
+    const addBtn = document.querySelector('.btn-add-item');
+    if (addBtn) {
+      setTimeout(() => {
+        addBtn.classList.remove('pulse');
+        void addBtn.offsetWidth;
+        addBtn.classList.add('pulse');
+        addBtn.addEventListener('animationend', () => addBtn.classList.remove('pulse'), { once: true });
+      }, 350);
+    }
 
     // Show closed-out celebration if fully spent
     const deposit = amountForDay(activeDayNumber);

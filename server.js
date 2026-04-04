@@ -71,6 +71,10 @@ db.exec(`
   );
 `);
 
+// Migrations for new columns
+try { db.exec('ALTER TABLE user_settings ADD COLUMN goals TEXT DEFAULT NULL'); } catch (_) {}
+try { db.exec('ALTER TABLE user_settings ADD COLUMN goals_detail TEXT DEFAULT NULL'); } catch (_) {}
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -157,11 +161,11 @@ app.get('/api/settings', requireAuth, (req, res) => {
 });
 
 app.post('/api/settings', requireAuth, (req, res) => {
-  const { game_mode, start_amount, start_date, custom_type, custom_step, reminder_email, reminder_time } = req.body;
+  const { game_mode, start_amount, start_date, custom_type, custom_step, reminder_email, reminder_time, goals, goals_detail } = req.body;
   const isNew = !db.prepare('SELECT id FROM user_settings WHERE user_id = ?').get(req.userId);
   db.prepare(`
-    INSERT INTO user_settings (user_id, game_mode, start_amount, start_date, custom_type, custom_step, reminder_email, reminder_time)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO user_settings (user_id, game_mode, start_amount, start_date, custom_type, custom_step, reminder_email, reminder_time, goals, goals_detail)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(user_id) DO UPDATE SET
       game_mode      = excluded.game_mode,
       start_amount   = excluded.start_amount,
@@ -169,11 +173,14 @@ app.post('/api/settings', requireAuth, (req, res) => {
       custom_type    = excluded.custom_type,
       custom_step    = excluded.custom_step,
       reminder_email = excluded.reminder_email,
-      reminder_time  = excluded.reminder_time
+      reminder_time  = excluded.reminder_time,
+      goals          = excluded.goals,
+      goals_detail   = excluded.goals_detail
   `).run(
     req.userId, game_mode, start_amount, start_date,
     custom_type ?? 'add', custom_step ?? null,
-    reminder_email ?? null, reminder_time ?? '08:00'
+    reminder_email ?? null, reminder_time ?? '08:00',
+    goals ?? null, goals_detail ?? null
   );
   // Send day 1 reminder immediately for new users who opted into emails
   if (isNew && reminder_email) {

@@ -330,6 +330,185 @@
       transform: translateY(-1px);
     }
 
+    /* ---- Onboarding steps ---- */
+    .ob-section {
+      background: var(--cream-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .ob-section-header { margin-bottom: 1.3rem; }
+    .ob-section-header h2 {
+      font-size: 1.25rem;
+      font-family: Georgia, serif;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .ob-section-header p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin: 0;
+    }
+
+    /* Goal chips */
+    .goal-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-bottom: 1.5rem;
+    }
+    .goal-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1.05rem;
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.86rem;
+      font-family: inherit;
+      color: var(--text-muted);
+      transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    .goal-chip:hover {
+      border-color: var(--gold);
+      color: var(--brown);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(200,149,42,0.15);
+    }
+    .goal-chip.selected {
+      border-color: var(--gold);
+      background: linear-gradient(160deg, #fffcf2, #fff8e0);
+      color: var(--brown);
+      font-weight: 600;
+      box-shadow: 0 3px 10px rgba(200,149,42,0.2);
+    }
+    .goal-chip .chip-icon { font-size: 1.05rem; line-height: 1; }
+
+    /* Goals detail textarea */
+    .ob-goals-detail { margin-top: 0.25rem; }
+    .ob-goals-detail label {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      font-style: italic;
+    }
+    .ob-goals-detail textarea {
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 90px;
+      resize: vertical;
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.7rem 0.9rem;
+      border: 1.5px solid var(--border-2);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      line-height: 1.55;
+      transition: border-color 0.15s;
+    }
+    .ob-goals-detail textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .ob-goals-detail textarea::placeholder { color: var(--text-muted); opacity: 0.75; }
+
+    /* Reminder section */
+    .ob-reminder-section h2 {
+      font-size: 1.25rem;
+      font-family: Georgia, serif;
+      margin-bottom: 0.5rem;
+    }
+    .ob-reminder-section p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+    .ob-reminder-opt {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .ob-reminder-opt input[type="checkbox"] {
+      width: 1.05rem;
+      height: 1.05rem;
+      accent-color: var(--gold);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .ob-time-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-top: 0.25rem;
+    }
+    .ob-time-wrap label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .ob-time-wrap input[type="time"] {
+      font-size: 1rem;
+      padding: 0.55rem 0.8rem;
+      border: 1.5px solid var(--border-2);
+      border-radius: 8px;
+      background: #fff;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+    .ob-time-wrap input[type="time"]:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    /* Step nav */
+    .ob-step-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 0.5rem 0 1.5rem;
+    }
+    .btn-next {
+      background: linear-gradient(135deg, #d4a030 0%, #b87820 100%);
+      color: #fff;
+      font-size: 1.05rem;
+      padding: 0.8rem 2.2rem;
+      border-radius: 9px;
+      font-family: Georgia, serif;
+      letter-spacing: 0.03em;
+      box-shadow: 0 4px 14px rgba(180,110,0,0.3);
+      transition: box-shadow 0.15s, transform 0.1s, background 0.15s;
+    }
+    .btn-next:hover {
+      background: linear-gradient(135deg, #c8952a 0%, #a87020 100%);
+      box-shadow: 0 6px 18px rgba(180,110,0,0.38);
+      transform: translateY(-1px);
+    }
+    .btn-back {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 0.5rem 0;
+      transition: color 0.15s;
+    }
+    .btn-back:hover { color: var(--brown); }
+
     /* ===================== GAME VIEW ===================== */
     #game { display: none; }
     #bmc-widget { display: none; }
@@ -587,7 +766,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.25rem;
     }
     @media (max-width: 480px) {
       .stats-bar { grid-template-columns: 1fr 1fr; }
@@ -796,33 +975,10 @@
       font-style: italic;
       margin-bottom: 0.6rem;
     }
-    /* ---- Inspiration section ---- */
-    .inspiration-section {
-      margin-top: 1.2rem;
-      margin-bottom: 1.1rem;
+    /* ---- Your Vision section ---- */
+    .vision-section {
+      margin-bottom: 1.5rem;
     }
-    .inspiration-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      background: none;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      color: var(--gold-dark);
-      font-size: 0.8rem;
-      font-style: italic;
-      font-family: Georgia, serif;
-      margin-bottom: 0.6rem;
-      opacity: 0.8;
-    }
-    .inspiration-toggle:hover { opacity: 1; }
-    .inspiration-toggle .toggle-arrow {
-      font-size: 0.65rem;
-      transition: transform 0.2s;
-      font-style: normal;
-    }
-    .inspiration-toggle.open .toggle-arrow { transform: rotate(90deg); }
     .inspiration-cards {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -842,6 +998,78 @@
     .inspo-card:hover {
       border-color: rgba(200,149,42,0.5);
       box-shadow: 0 2px 8px rgba(180,130,30,0.1);
+    }
+    .inspo-card-vision {
+      grid-column: 1 / -1;
+      background: linear-gradient(160deg, #fffcf2, #fff8e0);
+      border-color: rgba(200,149,42,0.35);
+    }
+    .inspo-card-editable { cursor: pointer; }
+    .inspo-card-editable:hover { border-color: var(--gold); box-shadow: 0 3px 10px rgba(200,149,42,0.18); }
+    .inspo-vision-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.3rem;
+    }
+    .inspo-vision-card-top .inspo-icon { margin-bottom: 0; }
+    .inspo-vision-edit-hint { font-size: 0.8rem; opacity: 0.5; }
+
+    /* Inline vision setup (no goals saved) */
+    .inspo-vision-setup {
+      width: 100%;
+      grid-column: 1 / -1;
+    }
+    .inspo-vision-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1.1rem;
+    }
+    .inspo-vision-icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; }
+    .inspo-vision-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--brown);
+      margin-bottom: 0.2rem;
+    }
+    .inspo-vision-sub {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .inline-goal-chips { margin-bottom: 0.9rem; }
+    .inspo-vision-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 72px;
+      resize: vertical;
+      font-family: inherit;
+      font-size: 0.88rem;
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid var(--border-2);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 0.8rem;
+      transition: border-color 0.15s;
+    }
+    .inspo-vision-textarea:focus { outline: none; border-color: var(--gold); }
+    .inspo-vision-textarea::placeholder { color: var(--text-muted); opacity: 0.75; }
+    .btn-save-goals {
+      background: linear-gradient(135deg, #d4a030 0%, #b87820 100%);
+      color: #fff;
+      font-size: 0.9rem;
+      padding: 0.55rem 1.4rem;
+      border-radius: 7px;
+      font-family: inherit;
+      box-shadow: 0 3px 10px rgba(180,110,0,0.28);
+      transition: box-shadow 0.15s, transform 0.1s;
+    }
+    .btn-save-goals:hover {
+      box-shadow: 0 5px 14px rgba(180,110,0,0.36);
+      transform: translateY(-1px);
     }
     .inspo-icon {
       font-size: 1.5rem;
@@ -868,6 +1096,23 @@
       box-shadow: 0 2px 10px rgba(180,130,30,0.09);
       position: relative;
       overflow: hidden;
+    }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--brown);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(200,149,42,0.22);
     }
     .items-entry-label {
       font-size: 0.7rem;
@@ -921,25 +1166,25 @@
       gap: 0.5rem;
     }
     .btn-save-inline {
-      background: var(--gold);
+      background: linear-gradient(135deg, #d4a030 0%, #b87820 100%);
       color: #fff;
       font-family: inherit;
       font-size: 0.9rem;
-      font-weight: bold;
-      padding: 0.55rem 0.85rem;
-      min-height: 44px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      padding: 0.55rem 1.4rem;
+      border-radius: 7px;
+      box-shadow: 0 3px 10px rgba(180,110,0,0.28);
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.15s ease, background 0.15s;
+      transition: opacity 0.2s ease, box-shadow 0.15s, transform 0.1s;
     }
     .btn-save-inline.dirty {
       opacity: 1;
       pointer-events: auto;
     }
-    .btn-save-inline:hover { background: var(--gold-dark); }
+    .btn-save-inline:hover {
+      box-shadow: 0 5px 14px rgba(180,110,0,0.36);
+      transform: translateY(-1px);
+    }
     .btn-save-inline.btn-save-pop { animation: savePop 0.55s cubic-bezier(0.34,1.56,0.64,1); }
     .desc-field-wrap {
       position: relative;
@@ -1263,7 +1508,15 @@
       align-items: center;
       margin-bottom: 1rem;
     }
-    .history-header h2 { font-size: 1.1rem; color: #7a5c1e; }
+    .history-header h2 {
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--brown);
+      font-family: inherit;
+      margin: 0;
+    }
     .history-header .toggle-btn { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
     .history-list { display: flex; flex-direction: column; gap: 1.1rem; }
 
@@ -1655,77 +1908,120 @@
 
 <!-- ===================== ONBOARDING ===================== -->
 <div id="onboarding" class="container">
-  <div class="onboarding-hero">
-    <span class="hero-icon">✨</span>
-    <h1>Prosperity Game</h1>
-    <p>Each day, you receive a growing sum of imaginary money to spend joyfully in your mind.</p>
+
+  <!-- ── Step 1: Goals ── -->
+  <div id="ob-step-1">
+    <div class="onboarding-hero">
+      <span class="hero-icon">✨</span>
+      <h1>Prosperity Game</h1>
+      <p>Each day, you receive a growing sum of imaginary money to spend joyfully in your mind.</p>
+    </div>
+
+    <!-- Goals multiselect -->
+    <div class="ob-section">
+      <div class="ob-section-header">
+        <h2>What would you like to achieve with money? 💰</h2>
+        <p>Pick everything that resonates — no wrong answers here.</p>
+      </div>
+      <div class="goal-chips" id="ob-goal-chips"><!-- rendered by JS --></div>
+      <div class="ob-goals-detail">
+        <label for="ob_goals_detail">Paint the picture 🧑🏼‍🎨</label>
+        <textarea id="ob_goals_detail" placeholder="The more specific and real it feels, the more powerful the practice. What does your abundant life actually look like?"></textarea>
+      </div>
+    </div>
+
+    <!-- Reminder time -->
+    <div class="ob-section ob-reminder-section">
+      <h2>Lock in your daily ritual 🔐</h2>
+      <p>Playing this game every day rewires your mind and helps you align with your goals. What time are you in the best headspace to play? We'll send a reminder to your email so you never miss a day.</p>
+      <label class="ob-reminder-opt">
+        <input type="checkbox" id="ob_reminder_enabled" checked onchange="toggleReminderTime()" />
+        Yes! Send me a daily reminder
+      </label>
+      <div id="ob-time-wrap" class="ob-time-wrap">
+        <label for="ob_reminder_time">Best time for me:</label>
+        <input type="time" id="ob_reminder_time" value="08:00" />
+      </div>
+    </div>
+
+    <div class="ob-step-nav">
+      <button class="btn-next" onclick="goToStep2()">Set Up Your Game &rarr;</button>
+    </div>
   </div>
 
-  <!-- Mode cards -->
-  <div class="mode-cards">
-    <div class="mode-card selected" data-mode="linear" onclick="selectMode('linear')">
-      <div class="mc-icon">📈</div>
-      <div class="mc-name">Linear</div>
-      <div class="mc-desc">Add the same amount every day<br><em>Day 1: $1k &rarr; Day 2: $2k &rarr; Day 3: $3k</em></div>
+  <!-- ── Step 2: Game Config ── -->
+  <div id="ob-step-2" style="display:none">
+    <div class="onboarding-hero">
+      <span class="hero-icon">🎮</span>
+      <h1>Set Up Your Game</h1>
+      <p>Choose how your daily deposits grow and when you want to start.</p>
     </div>
-    <div class="mode-card" data-mode="doubling" onclick="selectMode('doubling')">
-      <div class="mc-icon">✨</div>
-      <div class="mc-name">Doubling</div>
-      <div class="mc-desc">Double your money every day<br><em>Day 1: $1k &rarr; Day 2: $2k &rarr; Day 3: $4k</em></div>
-    </div>
-    <div class="mode-card" data-mode="custom" onclick="selectMode('custom')">
-      <div class="mc-icon">🎛️</div>
-      <div class="mc-name">Custom</div>
-      <div class="mc-desc">Set your own starting amount and daily step or multiplier</div>
-    </div>
-  </div>
 
-  <!-- Config fields -->
-  <div class="onboarding-config">
-    <div class="config-grid">
-      <!-- Standard: start amount -->
-      <div id="ob-start-amount-wrap">
-        <label for="ob_start_amount">Starting Amount (Day 1)</label>
-        <input type="number" id="ob_start_amount" min="1" step="1" value="1000"
-               oninput="updatePreview()" />
+    <!-- Mode cards -->
+    <div class="mode-cards">
+      <div class="mode-card selected" data-mode="linear" onclick="selectMode('linear')">
+        <div class="mc-icon">📈</div>
+        <div class="mc-name">Linear</div>
+        <div class="mc-desc">Add the same amount every day<br><em>Day 1: $1k &rarr; Day 2: $2k &rarr; Day 3: $3k</em></div>
       </div>
-
-      <!-- Start date -->
-      <div>
-        <label for="ob_start_date">Start Date</label>
-        <input type="date" id="ob_start_date" oninput="updatePreview()" />
+      <div class="mode-card" data-mode="doubling" onclick="selectMode('doubling')">
+        <div class="mc-icon">✨</div>
+        <div class="mc-name">Doubling</div>
+        <div class="mc-desc">Double your money every day<br><em>Day 1: $1k &rarr; Day 2: $2k &rarr; Day 3: $4k</em></div>
       </div>
+      <div class="mode-card" data-mode="custom" onclick="selectMode('custom')">
+        <div class="mc-icon">🎛️</div>
+        <div class="mc-name">Custom</div>
+        <div class="mc-desc">Set your own starting amount and daily step or multiplier</div>
+      </div>
+    </div>
 
-      <!-- Custom fields (hidden unless custom mode) -->
-      <div class="custom-fields" id="ob-custom-fields">
-        <div>
-          <label>Daily Step Type</label>
-          <div class="custom-type-toggle">
-            <button class="toggle-btn active" id="tog-add" onclick="setCustomType('add')">+ Add</button>
-            <button class="toggle-btn" id="tog-multiply" onclick="setCustomType('multiply')">× Multiply</button>
-          </div>
-        </div>
-        <div>
-          <label for="ob_custom_step" id="ob-custom-step-label">Daily Increment ($)</label>
-          <input type="number" id="ob_custom_step" min="0.01" step="1" value="1000"
+    <!-- Config fields -->
+    <div class="onboarding-config">
+      <div class="config-grid">
+        <!-- Standard: start amount -->
+        <div id="ob-start-amount-wrap">
+          <label for="ob_start_amount">Starting Amount (Day 1)</label>
+          <input type="number" id="ob_start_amount" min="1" step="1" value="1000"
                  oninput="updatePreview()" />
         </div>
+
+        <!-- Start date -->
+        <div>
+          <label for="ob_start_date">Start Date</label>
+          <input type="date" id="ob_start_date" oninput="updatePreview()" />
+        </div>
+
+        <!-- Custom fields (hidden unless custom mode) -->
+        <div class="custom-fields" id="ob-custom-fields">
+          <div>
+            <label>Daily Step Type</label>
+            <div class="custom-type-toggle">
+              <button class="toggle-btn active" id="tog-add" onclick="setCustomType('add')">+ Add</button>
+              <button class="toggle-btn" id="tog-multiply" onclick="setCustomType('multiply')">× Multiply</button>
+            </div>
+          </div>
+          <div>
+            <label for="ob_custom_step" id="ob-custom-step-label">Daily Increment ($)</label>
+            <input type="number" id="ob_custom_step" min="0.01" step="1" value="1000"
+                   oninput="updatePreview()" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-box" id="ob-preview"></div>
+
+      <div class="start-btn-wrap">
+        <button class="btn-start" onclick="startGame()">Start My Game ✨</button>
       </div>
     </div>
 
-    <!-- Preview -->
-    <div class="preview-box" id="ob-preview"></div>
-
-    <div class="ob-reminder-row">
-      <label class="ob-reminder-label">
-        <input type="checkbox" id="ob_reminder_opt_in" checked />
-        Send me a daily reminder email at 8:00 AM
-      </label>
-    </div>
-    <div class="start-btn-wrap">
-      <button class="btn-start" onclick="startGame()">Start My Game</button>
+    <div class="ob-step-nav">
+      <button class="btn-back" onclick="goToStep1()">&larr; Back to Goals</button>
     </div>
   </div>
+
 </div>
 
 <!-- ===================== GAME VIEW ===================== -->
@@ -1836,38 +2132,14 @@
       </div>
     </div>
 
-    <!-- Inspiration section -->
-    <div class="inspiration-section">
-      <button class="inspiration-toggle open" onclick="toggleInspiration(this)">
-        <span class="toggle-arrow">▶</span> What can you spend this on?
-      </button>
-      <div class="inspiration-cards">
-        <div class="inspo-card">
-          <div class="inspo-icon">💎</div>
-          <div class="inspo-title">Luxuries &amp; Upgrades</div>
-          <div class="inspo-desc">Silk sheets, fine jewelry, high-end skincare. Things that feel exquisite.</div>
-        </div>
-        <div class="inspo-card">
-          <div class="inspo-icon">✈️</div>
-          <div class="inspo-title">Experiences &amp; Travel</div>
-          <div class="inspo-desc">Vacations, spa retreats, dream concerts, or classes you've always wanted.</div>
-        </div>
-        <div class="inspo-card">
-          <div class="inspo-icon">🏡</div>
-          <div class="inspo-title">Upgrade Daily Life</div>
-          <div class="inspo-desc">New car, home remodel, private chef, personal trainer. Elevate the everyday.</div>
-        </div>
-        <div class="inspo-card">
-          <div class="inspo-icon">🎁</div>
-          <div class="inspo-title">Generosity</div>
-          <div class="inspo-desc">Spend on people or causes you love. Generosity flows the energy forward.</div>
-        </div>
-
-      </div>
-    </div>
-
     <div id="prosperity-quote" class="prosperity-quote"></div>
     </div><!-- end today-spend-area -->
+  </div>
+
+  <!-- Your Vision section -->
+  <div id="vision-section" class="vision-section" style="display:none">
+    <div class="section-label">🌟 Your Vision</div>
+    <div class="inspiration-cards" id="inspo-cards-inner"></div>
   </div>
 
   <div id="future-notice" style="display:none">
@@ -1879,24 +2151,22 @@
     </div>
   </div>
 
-  <!-- Stats bar -->
-  <div class="stats-bar" id="stats-bar" style="display:none">
-    <div class="stat-item">
-      <div class="stat-label">Day</div>
-      <div class="stat-value large" id="stat-day">—</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">Today's Deposit</div>
-      <div class="stat-value" id="stat-today">—</div>
-    </div>
-    <div class="stat-item stat-total">
-      <div class="stat-label">Total Received</div>
-      <div class="stat-value" id="stat-total">—</div>
-    </div>
-  </div>
-
   <!-- History -->
   <div id="history-section" style="display:none">
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat-item">
+        <div class="stat-label">Day</div>
+        <div class="stat-value large" id="stat-day">—</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Today's Deposit</div>
+        <div class="stat-value" id="stat-today">—</div>
+      </div>
+      <div class="stat-item stat-total">
+        <div class="stat-label">Total Received</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+    </div>
     <div class="history-header">
       <h2>All Days</h2>
       <div style="display:flex;gap:0.4rem;align-items:center;">
@@ -1917,6 +2187,111 @@
   let todayDayNumber = null;
   let obMode = 'linear';
   let obCustomType = 'add';
+  let editingVision = false;
+
+  const GOAL_SPENDING = {
+    unexpected:   { desc: 'Open yourself up — let this money flow toward things you haven\'t even planned for yet.' },
+    big_purchase: { desc: 'Start browsing. Price it out. Feel what it\'s like to have the funds ready and waiting.' },
+    income:       { desc: 'Invest in your skills, your tools, your brand. Grow what brings money in.' },
+    debt:         { desc: 'Imagine making those payments effortlessly, one by one. Feel the weight lift.' },
+    abundance:    { desc: 'Spend freely and joyfully — that feeling IS the practice.' },
+    spending:     { desc: 'Buy the thing you\'ve been putting off. No justification needed — it\'s yours.' },
+    giving:       { desc: 'Who would you bless today? Pay a bill, send a gift, fund a dream.' },
+    invest:       { desc: 'Put this to work. Stocks, real estate, a business — watch it compound.' },
+    luxury:       { desc: 'The finest version of everything. You deserve to live exquisitely.' },
+  };
+
+  const STATIC_INSPO = [
+    { icon: '💎', title: 'Luxuries & Upgrades',   desc: 'Silk sheets, fine jewelry, high-end skincare. Things that feel exquisite.' },
+    { icon: '✈️', title: 'Experiences & Travel',  desc: 'Vacations, spa retreats, dream concerts, or classes you\'ve always wanted.' },
+    { icon: '🏡', title: 'Upgrade Daily Life',    desc: 'New car, home remodel, private chef, personal trainer. Elevate the everyday.' },
+    { icon: '🎁', title: 'Generosity',            desc: 'Spend on people or causes you love. Generosity flows the energy forward.' },
+  ];
+
+  function renderInspirationCards() {
+    const container = document.getElementById('inspo-cards-inner');
+    if (!container) return;
+
+    let goalIds = [];
+    try { goalIds = JSON.parse(settings.goals || '[]'); } catch (_) {}
+
+    if (goalIds.length && !editingVision) {
+      let html = '';
+
+      const visionText = settings.goals_detail
+        ? settings.goals_detail.replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        : '<em style="opacity:0.6">Add your vision…</em>';
+      html += `<div class="inspo-card inspo-card-vision inspo-card-editable" onclick="startEditingVision()" title="Click to edit">
+        <div class="inspo-vision-edit-hint">✏️</div>
+        <div class="inspo-desc">${visionText}</div>
+      </div>`;
+      container.innerHTML = html;
+    } else if (goalIds.length && editingVision) {
+      // Edit mode — pre-populate existing selections
+      container.innerHTML = `
+        <div class="inspo-vision-setup">
+          <div class="goal-chips inline-goal-chips">
+            ${GOALS.map(g => `<button class="goal-chip${goalIds.includes(g.id) ? ' selected' : ''}" data-id="${g.id}" onclick="this.classList.toggle('selected')" type="button"><span class="chip-icon">${g.icon}</span><span>${g.label}</span></button>`).join('')}
+          </div>
+          <textarea class="inspo-vision-textarea" id="inspo-goals-detail" placeholder="Paint the picture 🧑🏼‍🎨 — the more vivid, the more powerful.">${(settings.goals_detail || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <button class="btn-save-goals" onclick="saveGoalsInline()">Save ✨</button>
+            <button class="btn-back" onclick="cancelEditVision()">Cancel</button>
+            <span id="inspo-goals-saved" class="saved-badge"></span>
+          </div>
+        </div>`;
+    } else {
+      // No goals yet — show inline picker
+      container.innerHTML = `
+        <div class="inspo-vision-setup">
+          <div class="inspo-vision-sub" style="margin-bottom:0.9rem;font-size:0.83rem;color:var(--text-muted);">What would you like to achieve with money? Pick everything that resonates.</div>
+          <div class="goal-chips inline-goal-chips">
+            ${GOALS.map(g => `<button class="goal-chip" data-id="${g.id}" onclick="this.classList.toggle('selected')" type="button"><span class="chip-icon">${g.icon}</span><span>${g.label}</span></button>`).join('')}
+          </div>
+          <textarea class="inspo-vision-textarea" id="inspo-goals-detail" placeholder="Paint the picture 🧑🏼‍🎨 — the more vivid, the more powerful."></textarea>
+          <button class="btn-save-goals" onclick="saveGoalsInline()">Save My Vision ✨</button>
+          <span id="inspo-goals-saved" class="saved-badge"></span>
+        </div>`;
+    }
+  }
+
+  function startEditingVision() {
+    editingVision = true;
+    renderInspirationCards();
+  }
+
+  function cancelEditVision() {
+    editingVision = false;
+    renderInspirationCards();
+  }
+
+  async function saveGoalsInline() {
+    const selectedIds = Array.from(document.querySelectorAll('.inline-goal-chips .goal-chip.selected')).map(el => el.dataset.id);
+    const detail = (document.getElementById('inspo-goals-detail').value || '').trim();
+
+    settings.goals = JSON.stringify(selectedIds);
+    settings.goals_detail = detail || null;
+    editingVision = false;
+
+    await authFetch('/api/settings', { method: 'POST', body: JSON.stringify(settings) });
+
+    const badge = document.getElementById('inspo-goals-saved');
+    if (badge) { badge.textContent = 'Saved!'; badge.classList.add('visible'); setTimeout(() => badge.classList.remove('visible'), 2000); }
+
+    renderInspirationCards();
+  }
+
+  const GOALS = [
+    { id: 'unexpected',  icon: '✨', label: 'Money from unexpected sources' },
+    { id: 'big_purchase',icon: '🏡', label: 'Big purchase (vacation, car, house)' },
+    { id: 'income',      icon: '📈', label: 'Increasing my income' },
+    { id: 'debt',        icon: '🧹', label: 'Paying off debt' },
+    { id: 'abundance',   icon: '💫', label: 'Feeling abundant with money' },
+    { id: 'spending',    icon: '🌊', label: 'Less resistance to spending' },
+    { id: 'giving',      icon: '🎁', label: 'Giving more to others' },
+    { id: 'invest',      icon: '🌱', label: 'Building wealth & investments' },
+    { id: 'luxury',      icon: '👑', label: 'Live with luxury' },
+  ];
   let sCustomType = 'add';
   let historyFilter = 'all';
   let todayItems = []; // [{ desc, price, link }]
@@ -2076,7 +2451,42 @@
   function showOnboarding() {
     document.getElementById('onboarding').style.display = 'block';
     document.getElementById('game').style.display = 'none';
+    document.getElementById('ob-step-1').style.display = 'block';
+    document.getElementById('ob-step-2').style.display = 'none';
+    renderGoalChips();
     updatePreview();
+  }
+
+  function goToStep2() {
+    document.getElementById('ob-step-1').style.display = 'none';
+    document.getElementById('ob-step-2').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goToStep1() {
+    document.getElementById('ob-step-2').style.display = 'none';
+    document.getElementById('ob-step-1').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderGoalChips() {
+    const container = document.getElementById('ob-goal-chips');
+    container.innerHTML = GOALS.map(g => `
+      <button class="goal-chip" data-id="${g.id}" onclick="toggleGoal(this)" type="button">
+        <span class="chip-icon">${g.icon}</span>
+        <span>${g.label}</span>
+      </button>
+    `).join('');
+  }
+
+  function toggleGoal(el) {
+    el.classList.toggle('selected');
+  }
+
+  function toggleReminderTime() {
+    const enabled = document.getElementById('ob_reminder_enabled').checked;
+    document.getElementById('ob-time-wrap').style.opacity = enabled ? '1' : '0.4';
+    document.getElementById('ob_reminder_time').disabled = !enabled;
   }
 
   function showGame() {
@@ -2085,6 +2495,7 @@
     game.style.display = 'block';
     game.classList.add('fade-in');
     populateSettingsPanel();
+    renderInspirationCards();
     render();
   }
 
@@ -2204,15 +2615,21 @@
     if (!start_date) { alert('Please pick a start date.'); return; }
     if (!start_amount || start_amount < 1) { alert('Please enter a valid starting amount.'); return; }
 
-    const reminderOptIn = document.getElementById('ob_reminder_opt_in').checked;
+    const reminderEnabled = document.getElementById('ob_reminder_enabled').checked;
+    const reminderTime    = document.getElementById('ob_reminder_time').value || '08:00';
+    const selectedGoals   = Array.from(document.querySelectorAll('.goal-chip.selected')).map(el => el.dataset.id);
+    const goalsDetail     = (document.getElementById('ob_goals_detail').value || '').trim();
+
     const payload = {
       game_mode: obMode,
       start_amount,
       start_date,
       custom_type: obCustomType,
       custom_step: obMode === 'custom' ? custom_step : null,
-      reminder_email: reminderOptIn ? getEmail() : null,
-      reminder_time: '08:00'
+      reminder_email: reminderEnabled ? getEmail() : null,
+      reminder_time: reminderTime,
+      goals: selectedGoals.length ? JSON.stringify(selectedGoals) : null,
+      goals_detail: goalsDetail || null,
     };
 
     await authFetch('/api/settings', { method: 'POST', body: JSON.stringify(payload) });
@@ -2227,11 +2644,9 @@
     todayDayNumber = diff + 1;
 
     const futureNotice = document.getElementById('future-notice');
-    const statsBar = document.getElementById('stats-bar');
-
     if (todayDayNumber < 1) {
-      statsBar.style.display = 'none';
       document.getElementById('today-section').style.display = 'none';
+      document.getElementById('vision-section').style.display = 'none';
       document.getElementById('history-section').style.display = 'none';
       futureNotice.style.display = 'block';
       const startObj = new Date(settings.start_date + 'T00:00:00');
@@ -2241,13 +2656,12 @@
     }
 
     futureNotice.style.display = 'none';
+    document.getElementById('vision-section').style.display = 'block';
 
     const todayAmount = amountForDay(todayDayNumber);
     const total = runningTotal(todayDayNumber);
 
     // Stats bar
-    statsBar.style.display = 'grid';
-    statsBar.classList.add('slide-up');
     document.getElementById('stat-day').textContent = todayDayNumber;
     document.getElementById('stat-today').textContent = formatMoney(todayAmount);
     document.getElementById('stat-total').textContent = formatMoney(total);

@@ -46,7 +46,14 @@
       "Bash(git fetch:*)",
       "Bash(git merge:*)",
       "Bash(ls /Users/colinbovet/prosperity-game/.git/*.lock)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(EDITOR=true git rebase --continue)",
+      "Bash(node --check server.js)",
+      "Bash(~/.nvm/versions/node/v20.18.0/bin/node --check server.js)",
+      "Bash(export PATH=\"$PATH:/usr/local/bin:/opt/homebrew/bin\")",
+      "Read(//opt/homebrew/Cellar/node/25.8.2/bin/**)",
+      "Bash(/opt/homebrew/bin/node --check /Users/colinbovet/prosperity-game/server.js)",
+      "Bash(xargs kill:*)"
     ]
   }
 }

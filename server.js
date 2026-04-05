@@ -351,9 +351,9 @@ app.get('/api/admin/dashboard', (req, res) => {
   const dailySignups = db.prepare(`SELECT date(created_at, 'localtime') as t, COUNT(*) as n FROM users WHERE created_at >= datetime('now', '-30 days') GROUP BY t ORDER BY t ASC`).all();
   const dailyEntries = db.prepare(`SELECT date(created_at, 'localtime') as t, COUNT(*) as n FROM user_entries WHERE created_at >= datetime('now', '-30 days') GROUP BY t ORDER BY t ASC`).all();
 
-  const mobilePattern = '%Mobi%';
-  const mobileViews   = db.prepare("SELECT COUNT(*) as n FROM pageviews WHERE user_agent LIKE ?").get(mobilePattern).n;
-  const totalViews    = db.prepare('SELECT COUNT(*) as n FROM pageviews').get().n;
+  const totalViews   = db.prepare('SELECT COUNT(*) as n FROM pageviews').get().n;
+  const knownViews   = db.prepare("SELECT COUNT(*) as n FROM pageviews WHERE user_agent IS NOT NULL").get().n;
+  const mobileViews  = db.prepare("SELECT COUNT(*) as n FROM pageviews WHERE user_agent LIKE '%Mobi%'").get().n;
 
   res.json({
     totals: {
@@ -362,7 +362,8 @@ app.get('/api/admin/dashboard', (req, res) => {
       entries:       db.prepare('SELECT COUNT(*) as n FROM user_entries').get().n,
       repeat_visits: db.prepare('SELECT COUNT(*) as n FROM pageviews WHERE user_id IS NOT NULL').get().n,
       mobile_views:  mobileViews,
-      desktop_views: totalViews - mobileViews,
+      desktop_views: knownViews - mobileViews,
+      known_views:   knownViews,
     },
     hourly: mergeRows(hourlyPv, hourlySignups, hourlyEntries),
     daily:  mergeRows(dailyPv,  dailySignups,  dailyEntries),

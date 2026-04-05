@@ -1867,8 +1867,8 @@
       border-radius: 4px;
       transition: width 0.4s ease;
     }
-    .admin-device-bar--mobile  { background: #c8952a; }
-    .admin-device-bar--desktop { background: #5a8a6a; }
+    .admin-device-bar--mobile  { background: linear-gradient(to right, #c8952a, #e6b84a); }
+    .admin-device-bar--desktop { background: linear-gradient(to right, #7a5a1e, #a07830); }
     .admin-device-pct {
       font-size: 0.82rem;
       font-weight: 600;
@@ -3401,12 +3401,12 @@
         ${adminTotalCard('Repeat Visits', t.repeat_visits)}
       </div>`;
 
-    const total = t.mobile_views + t.desktop_views;
-    const mobilePct  = total ? Math.round(t.mobile_views  / total * 100) : 0;
-    const desktopPct = total ? Math.round(t.desktop_views / total * 100) : 0;
+    const knownTotal = t.known_views || 0;
+    const mobilePct  = knownTotal ? Math.round(t.mobile_views  / knownTotal * 100) : 0;
+    const desktopPct = knownTotal ? Math.round(t.desktop_views / knownTotal * 100) : 0;
     const deviceHtml = `
       <div class="admin-device-breakdown">
-        <div class="admin-device-title">Device Breakdown</div>
+        <div class="admin-device-title">Device Breakdown <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;color:#a08060">(${knownTotal.toLocaleString()} tracked)</span></div>
         <div class="admin-device-bars">
           <div class="admin-device-row">
             <span class="admin-device-label">Mobile</span>

@@ -1829,6 +1829,57 @@
       padding: 3rem;
       font-size: 0.9rem;
     }
+    .admin-device-breakdown {
+      background: rgba(255,255,255,0.55);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .admin-device-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #8a6a50;
+      margin-bottom: 0.75rem;
+    }
+    .admin-device-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .admin-device-label {
+      width: 4.5rem;
+      font-size: 0.8rem;
+      color: #5a4030;
+      flex-shrink: 0;
+    }
+    .admin-device-bar-wrap {
+      flex: 1;
+      background: rgba(0,0,0,0.07);
+      border-radius: 4px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .admin-device-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+    .admin-device-bar--mobile  { background: #c8952a; }
+    .admin-device-bar--desktop { background: #5a8a6a; }
+    .admin-device-pct {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #5a4030;
+      min-width: 3rem;
+      text-align: right;
+    }
+    .admin-device-count {
+      font-weight: 400;
+      color: #8a6a50;
+    }
 
     /* ---- Responsive tweaks ---- */
     @media (max-width: 420px) {
@@ -3350,6 +3401,30 @@
         ${adminTotalCard('Repeat Visits', t.repeat_visits)}
       </div>`;
 
+    const total = t.mobile_views + t.desktop_views;
+    const mobilePct  = total ? Math.round(t.mobile_views  / total * 100) : 0;
+    const desktopPct = total ? Math.round(t.desktop_views / total * 100) : 0;
+    const deviceHtml = `
+      <div class="admin-device-breakdown">
+        <div class="admin-device-title">Device Breakdown</div>
+        <div class="admin-device-bars">
+          <div class="admin-device-row">
+            <span class="admin-device-label">Mobile</span>
+            <div class="admin-device-bar-wrap">
+              <div class="admin-device-bar admin-device-bar--mobile" style="width:${mobilePct}%"></div>
+            </div>
+            <span class="admin-device-pct">${mobilePct}% <span class="admin-device-count">(${t.mobile_views.toLocaleString()})</span></span>
+          </div>
+          <div class="admin-device-row">
+            <span class="admin-device-label">Desktop</span>
+            <div class="admin-device-bar-wrap">
+              <div class="admin-device-bar admin-device-bar--desktop" style="width:${desktopPct}%"></div>
+            </div>
+            <span class="admin-device-pct">${desktopPct}% <span class="admin-device-count">(${t.desktop_views.toLocaleString()})</span></span>
+          </div>
+        </div>
+      </div>`;
+
     const chartsHtml = `
       <div class="admin-charts">
         ${adminChartCard('Pageviews', rows, 'pageviews')}
@@ -3358,7 +3433,7 @@
         ${adminChartCard('Repeat Visits', rows, 'repeat_visits')}
       </div>`;
 
-    document.getElementById('admin-content').innerHTML = totalsHtml + chartsHtml;
+    document.getElementById('admin-content').innerHTML = totalsHtml + deviceHtml + chartsHtml;
   }
 
   function adminTotalCard(label, value) {

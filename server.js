@@ -74,6 +74,7 @@ db.exec(`
 // Migrations for new columns
 try { db.exec('ALTER TABLE user_settings ADD COLUMN goals TEXT DEFAULT NULL'); } catch (_) {}
 try { db.exec('ALTER TABLE user_settings ADD COLUMN goals_detail TEXT DEFAULT NULL'); } catch (_) {}
+try { db.exec('ALTER TABLE pageviews ADD COLUMN user_agent TEXT DEFAULT NULL'); } catch (_) {}
 
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -234,7 +235,8 @@ app.post('/api/pageview', (req, res) => {
       userId = payload.userId;
     } catch (_) { /* invalid/expired JWT — treat as anonymous */ }
   }
-  db.prepare('INSERT INTO pageviews (user_id) VALUES (?)').run(userId);
+  const ua = req.headers['user-agent'] || null;
+  db.prepare('INSERT INTO pageviews (user_id, user_agent) VALUES (?, ?)').run(userId, ua);
   res.json({ ok: true });
 });
 
@@ -349,16 +351,54 @@ app.get('/api/admin/dashboard', (req, res) => {
   const dailySignups = db.prepare(`SELECT date(created_at, 'localtime') as t, COUNT(*) as n FROM users WHERE created_at >= datetime('now', '-30 days') GROUP BY t ORDER BY t ASC`).all();
   const dailyEntries = db.prepare(`SELECT date(created_at, 'localtime') as t, COUNT(*) as n FROM user_entries WHERE created_at >= datetime('now', '-30 days') GROUP BY t ORDER BY t ASC`).all();
 
+  const mobilePattern = '%Mobi%';
+  const mobileViews   = db.prepare("SELECT COUNT(*) as n FROM pageviews WHERE user_agent LIKE ?").get(mobilePattern).n;
+  const totalViews    = db.prepare('SELECT COUNT(*) as n FROM pageviews').get().n;
+
   res.json({
     totals: {
-      pageviews:     db.prepare('SELECT COUNT(*) as n FROM pageviews').get().n,
+      pageviews:     totalViews,
       signups:       db.prepare('SELECT COUNT(*) as n FROM users').get().n,
       entries:       db.prepare('SELECT COUNT(*) as n FROM user_entries').get().n,
       repeat_visits: db.prepare('SELECT COUNT(*) as n FROM pageviews WHERE user_id IS NOT NULL').get().n,
+      mobile_views:  mobileViews,
+      desktop_views: totalViews - mobileViews,
     },
     hourly: mergeRows(hourlyPv, hourlySignups, hourlyEntries),
     daily:  mergeRows(dailyPv,  dailySignups,  dailyEntries),
   });
+});
+
+// ---- Admin: send early-user thank-you email ----
+app.post('/api/admin/send-early-user-email', async (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  if (!resend) return res.status(500).json({ error: 'Email not configured' });
+
+  // Day 1 = April 1 2026, Day 2 = April 2 2026
+  const earlyUsers = db.prepare(
+    "SELECT email FROM users WHERE date(created_at, 'localtime') IN ('2026-04-01', '2026-04-02')"
+  ).all();
+
+  const results = [];
+  for (const u of earlyUsers) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: 'Prosperity Game <hello@the-prosperity-game.com>',
+        to: u.email,
+        subject: 'Thank you for being here from the start ✨',
+        html: buildEarlyUserEmail(),
+      });
+      if (error) throw new Error(error.message);
+      results.push({ email: u.email, ok: true, id: data.id });
+    } catch (err) {
+      results.push({ email: u.email, ok: false, error: err.message });
+    }
+  }
+
+  res.json({ sent: results.filter(r => r.ok).length, failed: results.filter(r => !r.ok).length, results });
 });
 
 app.delete('/api/reset', requireAuth, (req, res) => {
@@ -403,6 +443,112 @@ function calcDepositAmount(s, dayNum) {
 }
 
 // ---- Email templates ----
+function buildEarlyUserEmail() {
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#fdf8ee;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#fdf8ee;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(180,130,30,0.12);">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#c8952a,#e6b84a);padding:36px 40px;text-align:center;">
+            <div style="font-size:32px;margin-bottom:8px;">✨</div>
+            <div style="font-size:24px;font-weight:bold;color:#fff;letter-spacing:-0.5px;">Prosperity Game</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:6px;letter-spacing:0.08em;text-transform:uppercase;">A note for our earliest players</div>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:40px 40px 28px;color:#3a2a0a;line-height:1.75;font-size:15px;">
+
+            <p style="margin:0 0 20px;">You signed up on day one (or two) — before we'd worked out half the kinks, before the app had half its current features. That means a lot, and we wanted to say <strong>thank you</strong>.</p>
+
+            <p style="margin:0 0 24px;">Here's everything we've shipped since you first played:</p>
+
+            <!-- Change list -->
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding:0 0 16px;">
+                  <div style="background:#fdf8ee;border-left:3px solid #e6b84a;border-radius:0 8px 8px 0;padding:14px 18px;">
+                    <div style="font-size:14px;font-weight:bold;color:#c8952a;margin-bottom:4px;">Your Vision &amp; Goals onboarding</div>
+                    <div style="font-size:13px;color:#666;">Set an intention and a goal before you start spending. The game now feels like a practice, not just a tracker.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 0 16px;">
+                  <div style="background:#fdf8ee;border-left:3px solid #e6b84a;border-radius:0 8px 8px 0;padding:14px 18px;">
+                    <div style="font-size:14px;font-weight:bold;color:#c8952a;margin-bottom:4px;">Daily reminder emails</div>
+                    <div style="font-size:13px;color:#666;">Opt in during setup and we'll nudge you each morning with your day number and deposit amount — so you never miss a day.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 0 16px;">
+                  <div style="background:#fdf8ee;border-left:3px solid #e6b84a;border-radius:0 8px 8px 0;padding:14px 18px;">
+                    <div style="font-size:14px;font-weight:bold;color:#c8952a;margin-bottom:4px;">Mobile-first spending entry</div>
+                    <div style="font-size:13px;color:#666;">The entry experience was rebuilt for phones — larger inputs, no accidental zoom on iOS, and a journaling feel that makes it easy to get into flow.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 0 16px;">
+                  <div style="background:#fdf8ee;border-left:3px solid #e6b84a;border-radius:0 8px 8px 0;padding:14px 18px;">
+                    <div style="font-size:14px;font-weight:bold;color:#c8952a;margin-bottom:4px;">Deposit animation</div>
+                    <div style="font-size:13px;color:#666;">Your daily deposit now arrives with a satisfying particle burst. Small thing, big energy shift.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 0 16px;">
+                  <div style="background:#fdf8ee;border-left:3px solid #e6b84a;border-radius:0 8px 8px 0;padding:14px 18px;">
+                    <div style="font-size:14px;font-weight:bold;color:#c8952a;margin-bottom:4px;">Smarter save &amp; auto-remove</div>
+                    <div style="font-size:13px;color:#666;">The Save button now only appears when you've made a change, and removing your last item auto-saves so nothing gets lost.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 0 4px;">
+                  <div style="background:#fdf8ee;border-left:3px solid #e6b84a;border-radius:0 8px 8px 0;padding:14px 18px;">
+                    <div style="font-size:14px;font-weight:bold;color:#c8952a;margin-bottom:4px;">Overall polish</div>
+                    <div style="font-size:13px;color:#666;">Centered header, sign-out moved to settings, stats bar repositioned, and a dozen small fixes to make everything feel more intentional.</div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:28px 0 20px;">We're just getting started. If you have thoughts, feedback, or features you'd love to see — reply to this email. We read everything.</p>
+
+            <p style="margin:0 0 32px;">With love and abundance,<br><strong>The Prosperity Game team</strong></p>
+
+            <div style="text-align:center;">
+              <a href="${BASE_URL}"
+                 style="display:inline-block;background:linear-gradient(135deg,#c8952a,#e6b84a);color:#fff;text-decoration:none;padding:14px 36px;border-radius:30px;font-size:15px;font-weight:bold;letter-spacing:0.03em;">
+                Play Today ✨
+              </a>
+            </div>
+
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:20px 40px;text-align:center;border-top:1px solid #f0e8d0;">
+            <p style="margin:0;font-size:12px;color:#bbb;font-style:italic;">
+              "Whatever you are thinking about is literally like planning a future event." — Abraham-Hicks
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
 function buildMagicLinkEmail(token, email) {
   const url = `${BASE_URL}?token=${token}`;
   return `<!DOCTYPE html>
@@ -526,6 +672,29 @@ cron.schedule('* * * * *', () => {
       })
       .catch(err => console.error(`Reminder failed for ${s.reminder_email}:`, err.message));
   }
+});
+
+// ---- Inbound email forwarding (Resend webhook) ----
+// Resend POSTs here when an email arrives at hello@the-prosperity-game.com.
+// Set INBOUND_FORWARD_TO=your@personal.email in .env to enable forwarding.
+app.post('/api/inbound-email', express.json({ limit: '5mb' }), async (req, res) => {
+  res.json({ ok: true }); // ack immediately so Resend doesn't retry
+
+  const forwardTo = process.env.INBOUND_FORWARD_TO;
+  if (!resend || !forwardTo) return;
+
+  const { from, subject, html, text, to } = req.body;
+  const replyTo = from || undefined;
+  const subjectLine = subject ? `Fwd: ${subject}` : 'Forwarded email (no subject)';
+  const bodyHtml = html || (text ? `<pre style="font-family:sans-serif">${text}</pre>` : '<p>(empty)</p>');
+
+  resend.emails.send({
+    from: 'hello@the-prosperity-game.com',
+    to:   forwardTo,
+    reply_to: replyTo,
+    subject: subjectLine,
+    html: `<p><strong>From:</strong> ${from || '(unknown)'}<br><strong>To:</strong> ${to || 'hello@the-prosperity-game.com'}<br><strong>Subject:</strong> ${subject || '(none)'}</p><hr>${bodyHtml}`,
+  }).catch(err => console.error('Inbound forward failed:', err.message));
 });
 
 app.listen(PORT, () => {

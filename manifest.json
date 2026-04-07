@@ -1,0 +1,13 @@
+{
+  "name": "Prosperity Game",
+  "short_name": "Prosperity",
+  "description": "Your daily practice in abundance thinking.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdf8f0",
+  "theme_color": "#c8952a",
+  "icons": [
+    { "src": "/public/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/public/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

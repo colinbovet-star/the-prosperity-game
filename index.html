@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Prosperity Game</title>
 
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/public/icons/icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Prosperity" />
+  <meta name="theme-color" content="#c8952a" />
+
   <!-- Open Graph -->
   <meta property="og:title" content="Prosperity Game" />
   <meta property="og:description" content="Manifest your abundance. A daily practice for rewiring your relationship with money, inspired by Abraham-Hicks." />
@@ -3621,6 +3630,11 @@
       result.push({ t: key, label, pageviews: r.pageviews||0, signups: r.signups||0, entries: r.entries||0, repeat_visits: r.repeat_visits||0 });
     }
     return result;
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 </script>
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="colinbovet" data-description="Support me on Buy me a coffee!" data-message="Love the game? Buy me a coffee! ☕️" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>

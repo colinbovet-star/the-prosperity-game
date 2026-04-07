@@ -1475,6 +1475,14 @@
     }
     .btn-add-item:hover { background: rgba(200,149,42,0.07); border-color: var(--gold); }
     /* ---- Suggestion chips ---- */
+    .suggestion-chips-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #a08060;
+      margin-bottom: 0.5rem;
+    }
     .suggestion-chips {
       display: flex;
       flex-wrap: wrap;
@@ -2197,7 +2205,10 @@
       <div class="deposit-particles" id="save-particles"></div>
       <div class="items-entry-label">✍️ Today's Spending<div class="today-remaining" id="today-remaining" style="display:none"></div></div>
       <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
-      <div class="suggestion-chips" id="suggestion-chips"></div>
+      <div id="suggestion-chips-wrap">
+        <div class="suggestion-chips-label">Starting points</div>
+        <div class="suggestion-chips" id="suggestion-chips"></div>
+      </div>
       <div id="items-container"></div>
       <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
       <div class="closed-out-state" id="closed-out-state">
@@ -2440,14 +2451,15 @@
   }
 
   function renderSuggestionChips() {
-    const el = document.getElementById('suggestion-chips');
-    if (!el) return;
+    const el   = document.getElementById('suggestion-chips');
+    const wrap = document.getElementById('suggestion-chips-wrap');
+    if (!el || !wrap) return;
     const firstDesc = todayItems[0]?.desc || '';
     if (firstDesc.length > 30 || todayItems.length > 1) {
-      el.style.display = 'none';
+      wrap.style.display = 'none';
       return;
     }
-    el.style.display = 'flex';
+    wrap.style.display = 'block';
     el.innerHTML = SUGGESTION_CHIPS.map((c, i) =>
       `<button class="suggestion-chip" onclick="applySuggestion(${i})">${c.emoji} ${c.label}</button>`
     ).join('');

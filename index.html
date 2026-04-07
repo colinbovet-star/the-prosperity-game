@@ -1474,6 +1474,29 @@
       transition: background 0.15s, border-color 0.15s;
     }
     .btn-add-item:hover { background: rgba(200,149,42,0.07); border-color: var(--gold); }
+    /* ---- Suggestion chips ---- */
+    .suggestion-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin: 0.1rem 0 1.1rem;
+    }
+    .suggestion-chip {
+      background: rgba(200,149,42,0.1);
+      border: 1px solid rgba(200,149,42,0.3);
+      color: #b8820a;
+      border-radius: 999px;
+      padding: 0.32rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .suggestion-chip:hover,
+    .suggestion-chip:active {
+      background: rgba(200,149,42,0.22);
+      border-color: rgba(200,149,42,0.7);
+    }
     /* ---- History item cards ---- */
     .hi-items { display: flex; flex-direction: column; gap: 0.25rem; }
     .hi-item {
@@ -2174,6 +2197,7 @@
       <div class="deposit-particles" id="save-particles"></div>
       <div class="items-entry-label">✍️ Today's Spending<div class="today-remaining" id="today-remaining" style="display:none"></div></div>
       <p class="today-prompt">This money is yours. Spend it with joy. What will you do, feel, and experience?</p>
+      <div class="suggestion-chips" id="suggestion-chips"></div>
       <div id="items-container"></div>
       <button class="btn-add-item" onclick="addItem()">What are you spending next? ✨</button>
       <div class="closed-out-state" id="closed-out-state">
@@ -2345,6 +2369,99 @@
   ];
   let sCustomType = 'add';
   let historyFilter = 'all';
+  const SUGGESTION_CHIPS = [
+    { emoji: '✈️', label: 'Dream trip',    tiers: [
+      'A luxury weekend getaway — boutique hotel, incredible food, and total relaxation somewhere beautiful.',
+      'A week-long international trip — business-class flights, five-star hotel, and every experience I\'ve dreamed of.',
+      'A two-week first-class journey anywhere in the world — private tours, Michelin-starred meals, and complete indulgence.',
+      'A private villa in my dream destination for a month — staff, chef, and every comfort imaginable.',
+    ]},
+    { emoji: '🏠', label: 'Home',          tiers: [
+      'A beautiful piece of furniture or decor that completely transforms a room I love spending time in.',
+      'A full room redesign — new furniture, lighting, and finishing touches that make it feel like a magazine shoot.',
+      'A major home renovation — dream kitchen, spa bathroom, or the extension I\'ve always wanted.',
+      'Building or buying the home I\'ve always pictured — exactly the location, size, and style I love.',
+    ]},
+    { emoji: '🚗', label: 'Dream car',     tiers: [
+      'A road trip adventure in a rented luxury car — open road, great music, total freedom.',
+      'An incredible car upgrade — sleek, reliable, and a genuine joy to drive every single day.',
+      'The car I\'ve always wanted, fully loaded, in my favourite colour, sitting in my driveway.',
+      'A collection of my dream cars — the sports car, the SUV, and the classic that turns every head.',
+    ]},
+    { emoji: '💆', label: 'Spa & wellness', tiers: [
+      'A full spa day — massage, facial, hot tub, and complete restoration from the inside out.',
+      'A wellness weekend retreat — yoga, treatments, organic meals, and total mental reset.',
+      'A week at a world-class wellness resort — personalised programme, expert therapists, and pure luxury.',
+      'A private wellness experience — personal trainer, nutritionist, and a month of full-body transformation.',
+    ]},
+    { emoji: '👗', label: 'Wardrobe',      tiers: [
+      'Several gorgeous new outfits that make me feel confident, beautiful, and completely myself.',
+      'A high-quality wardrobe refresh — timeless pieces from designers I love that I\'ll wear for years.',
+      'A complete wardrobe overhaul with a personal stylist — every item chosen to make me feel incredible.',
+      'A bespoke wardrobe — custom-tailored pieces made exactly for my body and personal style.',
+    ]},
+    { emoji: '🎓', label: 'Education',     tiers: [
+      'An online course or workshop that accelerates a skill I\'ve been wanting to develop.',
+      'A transformative programme or certification that opens a new chapter in my career or creative life.',
+      'A prestigious course, mastermind, or mentorship with someone at the top of their field.',
+      'Full funding for a degree, fellowship, or institution that sets me up for the next level of impact.',
+    ]},
+    { emoji: '💎', label: 'Jewellery',     tiers: [
+      'A beautiful piece of jewellery I\'ll put on every day and feel quietly amazing in.',
+      'A stunning designer piece — the kind that becomes a signature, a memory, a story.',
+      'A truly exceptional piece of fine jewellery — diamonds, gold, or a gemstone that takes my breath away.',
+      'A custom-designed jewellery collection — each piece an heirloom I\'ll pass down.',
+    ]},
+    { emoji: '🍽️', label: 'Fine dining',  tiers: [
+      'An unforgettable dinner at the best restaurant in the city — incredible food, wine, and atmosphere.',
+      'A private chef\'s table experience or a restaurant on my bucket list — the full tasting menu, the best wines.',
+      'A culinary tour — three cities, the finest tables, and a week of eating in a way I\'ll never forget.',
+      'My own private dining event — a world-class chef, my favourite people, and a night nobody will forget.',
+    ]},
+    { emoji: '🎁', label: 'Gift someone',  tiers: [
+      'A genuinely generous and thoughtful gift for someone I love — something they\'d never buy themselves.',
+      'An extraordinary experience gifted to someone special — a trip, a dinner, a memory they\'ll cherish.',
+      'Paying off something stressful for someone I care about — a bill, a debt, a burden lifted completely.',
+      'A life-changing gift — a house deposit, a business investment, or a dream fulfilled for someone I love.',
+    ]},
+    { emoji: '💻', label: 'Tech & tools',  tiers: [
+      'The laptop, camera, or creative tool upgrade that makes my work feel effortless and genuinely joyful.',
+      'A full studio or home office setup — everything optimised, beautiful, and built for deep work.',
+      'The best technology money can buy — gear that removes every friction point from my creative or professional life.',
+      'A full smart-home or studio build — every room optimised, automated, and exactly how I want it.',
+    ]},
+  ];
+
+  function chipTierIndex(amount) {
+    if (amount < 2000)  return 0;
+    if (amount < 10000) return 1;
+    if (amount < 50000) return 2;
+    return 3;
+  }
+
+  function renderSuggestionChips() {
+    const el = document.getElementById('suggestion-chips');
+    if (!el) return;
+    const firstDesc = todayItems[0]?.desc || '';
+    if (firstDesc.length > 30 || todayItems.length > 1) {
+      el.style.display = 'none';
+      return;
+    }
+    el.style.display = 'flex';
+    el.innerHTML = SUGGESTION_CHIPS.map((c, i) =>
+      `<button class="suggestion-chip" onclick="applySuggestion(${i})">${c.emoji} ${c.label}</button>`
+    ).join('');
+  }
+
+  function applySuggestion(i) {
+    const tier = chipTierIndex(amountForDay(activeDayNumber) || 1000);
+    todayItems[0].desc = SUGGESTION_CHIPS[i].tiers[tier];
+    markDirty();
+    renderItems();
+    const ta = document.querySelector('.item-desc-input');
+    if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); autoGrow(ta); }
+  }
+
   let todayItems = []; // [{ desc, price, link }]
   let linkPreviews = {}; // idx -> preview object | 'loading' | null
   let isDirty = false;
@@ -3022,6 +3139,7 @@
           </div>
         </div>`;
     }).join('');
+    renderSuggestionChips();
   }
 
   function setFilter(f) {

@@ -1483,6 +1483,70 @@
       transition: background 0.15s, border-color 0.15s;
     }
     .btn-add-item:hover { background: rgba(200,149,42,0.07); border-color: var(--gold); }
+    /* ---- PWA install prompt ---- */
+    .pwa-prompt {
+      position: fixed;
+      bottom: -280px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(420px, calc(100vw - 1.5rem));
+      background: var(--cream-3);
+      border: 1.5px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      padding: 1.4rem 1.4rem 2.2rem;
+      box-shadow: 0 -6px 40px rgba(180,130,30,0.18);
+      z-index: 999;
+      transition: bottom 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      text-align: center;
+    }
+    .pwa-prompt.pwa-prompt--visible { bottom: 0; }
+    .pwa-prompt-drag {
+      width: 36px; height: 4px;
+      background: rgba(200,149,42,0.35);
+      border-radius: 2px;
+      margin: 0 auto 1.1rem;
+    }
+    .pwa-prompt-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .pwa-prompt-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 0.5rem;
+    }
+    .pwa-prompt-body {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.1rem;
+    }
+    .pwa-share-icon {
+      display: inline-block;
+      border: 1.5px solid currentColor;
+      border-radius: 4px;
+      padding: 0 3px;
+      font-size: 0.8rem;
+      vertical-align: middle;
+      margin: 0 1px;
+    }
+    .pwa-install-btn {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.7rem 2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      max-width: 260px;
+    }
+    .pwa-prompt-close {
+      position: absolute;
+      top: 0.75rem; right: 1rem;
+      background: none; border: none;
+      font-size: 1.3rem; color: var(--text-muted);
+      cursor: pointer; line-height: 1;
+    }
     /* ---- Suggestion chips ---- */
     .suggestion-chips-label {
       font-size: 0.72rem;
@@ -3451,6 +3515,11 @@
     if (total > 0 && Math.abs(deposit - total) < 0.005) {
       showClosedOut();
     }
+
+    // Prompt to install PWA after their first ever entry
+    if (Object.keys(entries).length === 1) {
+      setTimeout(maybeShowPWAPrompt, 2000);
+    }
   }
 
   function showClosedOut() {
@@ -3502,6 +3571,55 @@
   }
 
   // ---- Admin Dashboard ----
+  // ---- PWA install prompt ----
+  let _deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); _deferredInstallPrompt = e; });
+
+  function _isRunningAsPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches || !!navigator.standalone;
+  }
+  function _isIOS() {
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
+  }
+  function _isMobileUA() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  function maybeShowPWAPrompt() {
+    if (_isRunningAsPWA()) return;
+    if (!_isMobileUA()) return;
+    if (localStorage.getItem('pg_pwa_prompted')) return;
+    localStorage.setItem('pg_pwa_prompted', '1');
+
+    const ios = _isIOS();
+    const el = document.createElement('div');
+    el.className = 'pwa-prompt';
+    el.innerHTML = `
+      <button class="pwa-prompt-close" onclick="this.closest('.pwa-prompt').remove()" aria-label="Dismiss">×</button>
+      <div class="pwa-prompt-drag"></div>
+      <div class="pwa-prompt-icon">✨</div>
+      <div class="pwa-prompt-title">Add to your home screen</div>
+      <div class="pwa-prompt-body">${ios
+        ? 'Tap the <strong>Share</strong> button <span class="pwa-share-icon">⬆</span> in your browser, then choose <strong>"Add to Home Screen"</strong> — so Prosperity is always one tap away.'
+        : 'Install Prosperity as an app for instant access every day.'
+      }</div>
+      ${(!ios && _deferredInstallPrompt)
+        ? '<button class="pwa-install-btn" onclick="triggerPWAInstall()">Install App</button>'
+        : ''
+      }
+    `;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('pwa-prompt--visible')));
+  }
+
+  async function triggerPWAInstall() {
+    if (!_deferredInstallPrompt) return;
+    _deferredInstallPrompt.prompt();
+    await _deferredInstallPrompt.userChoice;
+    _deferredInstallPrompt = null;
+    document.querySelector('.pwa-prompt')?.remove();
+  }
+
   let _adminKey = null;
   let _adminTab = 'hourly';
   let _adminData = null;

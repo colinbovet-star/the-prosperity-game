@@ -1483,6 +1483,56 @@
       transition: background 0.15s, border-color 0.15s;
     }
     .btn-add-item:hover { background: rgba(200,149,42,0.07); border-color: var(--gold); }
+    /* ---- Feedback section ---- */
+    .feedback-section {
+      background: var(--cream-2);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.25rem 1.4rem;
+      margin-top: 1.5rem;
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 90px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 0.65rem 0.8rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text);
+      resize: vertical;
+      margin-top: 0.65rem;
+      transition: border-color 0.2s;
+    }
+    .feedback-textarea:focus { outline: none; border-color: var(--gold); }
+    .feedback-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.7rem;
+      gap: 0.75rem;
+    }
+    .feedback-hint { font-size: 0.78rem; color: var(--text-muted); }
+    .feedback-submit {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .feedback-submit:disabled { opacity: 0.5; cursor: default; }
+    .feedback-thanks {
+      font-size: 0.88rem;
+      color: #5a8a5a;
+      margin-top: 0.6rem;
+      display: none;
+    }
     /* ---- PWA install prompt ---- */
     .pwa-prompt {
       position: fixed;
@@ -2051,7 +2101,8 @@
       <div class="admin-tab-group">
         <button class="admin-tab active" id="tab-hourly" onclick="adminSwitchTab('hourly')">Hourly (24h)</button>
         <button class="admin-tab" id="tab-daily" onclick="adminSwitchTab('daily')">Daily (30d)</button>
-        <button class="admin-tab" id="tab-entries" onclick="adminSwitchTab('entries')">Entries</button>
+        <button class="admin-tab" id="tab-entries"   onclick="adminSwitchTab('entries')">Entries</button>
+        <button class="admin-tab" id="tab-feedback" onclick="adminSwitchTab('feedback')">Feedback</button>
       </div>
       <button class="admin-refresh" onclick="adminLoad()">↻ Refresh</button>
     </div>
@@ -2369,6 +2420,17 @@
     <div class="history-list" id="history-list"></div>
   </div>
 
+  <!-- Feedback section -->
+  <div class="feedback-section" id="feedback-section" style="display:none">
+    <div class="section-label">💬 Share feedback</div>
+    <textarea class="feedback-textarea" id="feedback-text" placeholder="Got a suggestion, spotted a bug, or just want to say something? We read everything."></textarea>
+    <div class="feedback-footer">
+      <span class="feedback-hint">Anonymous feedback is fine too.</span>
+      <button class="feedback-submit" id="feedback-submit" onclick="submitFeedback()">Send →</button>
+    </div>
+    <div class="feedback-thanks" id="feedback-thanks">✓ Thank you — we'll read it!</div>
+  </div>
+
 </div>
 
 <script>
@@ -2539,6 +2601,12 @@
       'An extraordinary experience gifted to someone special — a trip, a dinner, a memory they\'ll cherish.',
       'Paying off something stressful for someone I care about — a bill, a debt, a burden lifted completely.',
       'A life-changing gift — a house deposit, a business investment, or a dream fulfilled for someone I love.',
+    ]},
+    { emoji: '🧹', label: 'Pay off debt',   tiers: [
+      'Paying off a credit card, loan, or bill that\'s been weighing on me — clearing it completely and feeling totally free.',
+      'Paying off every debt I have — wiping the slate clean and stepping into a fresh, abundant new chapter.',
+      'Eliminating all my debts in one fell swoop — mortgage, loans, everything — and feeling the full weight lift.',
+      'Paying off all my debts and those of the people I love — freeing everyone I care about to live without financial stress.',
     ]},
     { emoji: '💻', label: 'Tech & tools',  tiers: [
       'The laptop, camera, or creative tool upgrade that makes my work feel effortless and genuinely joyful.',
@@ -2933,6 +3001,7 @@
       document.getElementById('today-section').style.display = 'none';
       document.getElementById('vision-section').style.display = 'none';
       document.getElementById('history-section').style.display = 'none';
+      document.getElementById('feedback-section').style.display = 'none';
       futureNotice.style.display = 'block';
       const startObj = new Date(settings.start_date + 'T00:00:00');
       document.getElementById('future-date').textContent =
@@ -2956,6 +3025,7 @@
     loadDayForEditing(todayDayNumber, true);
 
     document.getElementById('history-section').style.display = 'block';
+    document.getElementById('feedback-section').style.display = 'block';
     renderHistory();
   }
 
@@ -3603,6 +3673,25 @@
   }
 
   // ---- Admin Dashboard ----
+  // ---- Feedback ----
+  async function submitFeedback() {
+    const ta  = document.getElementById('feedback-text');
+    const btn = document.getElementById('feedback-submit');
+    const msg = ta.value.trim();
+    if (!msg) return;
+    btn.disabled = true;
+    try {
+      await authFetch('/api/feedback', { method: 'POST', body: JSON.stringify({ message: msg }) });
+      ta.value = '';
+      document.getElementById('feedback-thanks').style.display = 'block';
+      setTimeout(() => { document.getElementById('feedback-thanks').style.display = 'none'; }, 5000);
+    } catch (e) {
+      alert('Something went wrong — please try again.');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
   // ---- PWA install prompt ----
   let _deferredInstallPrompt = null;
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); _deferredInstallPrompt = e; });
@@ -3661,10 +3750,10 @@
 
   function adminSwitchTab(tab) {
     _adminTab = tab;
-    document.getElementById('tab-hourly').classList.toggle('active', tab === 'hourly');
-    document.getElementById('tab-daily').classList.toggle('active', tab === 'daily');
-    document.getElementById('tab-entries').classList.toggle('active', tab === 'entries');
-    if (tab === 'entries') { adminLoadEntries(); return; }
+    ['hourly','daily','entries','feedback'].forEach(t =>
+      document.getElementById('tab-' + t).classList.toggle('active', t === tab));
+    if (tab === 'entries')  { adminLoadEntries();  return; }
+    if (tab === 'feedback') { adminLoadFeedback(); return; }
     if (_adminData) adminRender(_adminData);
   }
 
@@ -3690,6 +3779,38 @@
     } catch (err) {
       document.getElementById('admin-content').innerHTML = `<div class="admin-error">Error: ${err.message}</div>`;
     }
+  }
+
+  async function adminLoadFeedback() {
+    document.getElementById('admin-content').innerHTML = '<div class="admin-loading">Loading…</div>';
+    try {
+      const r = await fetch('/api/admin/feedback', { headers: { 'X-Admin-Key': _adminKey } });
+      if (!r.ok) throw new Error('Unauthorized or server error');
+      adminRenderFeedback(await r.json());
+    } catch (err) {
+      document.getElementById('admin-content').innerHTML = `<div class="admin-error">Error: ${err.message}</div>`;
+    }
+  }
+
+  function adminRenderFeedback(rows) {
+    if (!rows.length) {
+      document.getElementById('admin-content').innerHTML = '<div class="admin-loading">No feedback yet.</div>';
+      return;
+    }
+    const fmtDate = s => s ? s.slice(0, 16).replace('T', ' ') : '';
+    const rowsHtml = rows.map(row => `
+      <tr>
+        <td class="aet-date">${fmtDate(row.created_at)}</td>
+        <td class="aet-email" title="${row.email}">${row.email}</td>
+        <td class="aet-items" style="white-space:pre-wrap;max-width:420px">${row.message.replace(/</g,'&lt;')}</td>
+      </tr>`).join('');
+    document.getElementById('admin-content').innerHTML = `
+      <div class="admin-entries-wrap">
+        <table class="admin-entries-table">
+          <thead><tr><th>Date</th><th>User</th><th>Message</th></tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>`;
   }
 
   function adminRenderEntries(rows) {

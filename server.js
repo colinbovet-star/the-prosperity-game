@@ -69,6 +69,13 @@ db.exec(`
     user_id    INTEGER REFERENCES users(id),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS feedback (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER REFERENCES users(id),
+    message    TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 // Migrations for new columns
@@ -368,6 +375,38 @@ app.get('/api/admin/dashboard', (req, res) => {
     hourly: mergeRows(hourlyPv, hourlySignups, hourlyEntries),
     daily:  mergeRows(dailyPv,  dailySignups,  dailyEntries),
   });
+});
+
+// ---- User feedback ----
+app.post('/api/feedback', requireAuth, async (req, res) => {
+  const { message } = req.body;
+  if (!message || !message.trim()) return res.status(400).json({ error: 'Message required' });
+  db.prepare('INSERT INTO feedback (user_id, message) VALUES (?, ?)').run(req.userId, message.trim());
+  const user = db.prepare('SELECT email FROM users WHERE id = ?').get(req.userId);
+  if (resend && process.env.INBOUND_FORWARD_TO) {
+    resend.emails.send({
+      from: 'Prosperity Game <hello@the-prosperity-game.com>',
+      to: process.env.INBOUND_FORWARD_TO,
+      subject: `💬 New feedback from ${user?.email || 'a user'}`,
+      html: `<p><strong>From:</strong> ${user?.email || '(unknown)'}</p><p>${message.trim().replace(/\n/g, '<br>')}</p>`,
+    }).catch(err => console.error('Feedback email failed:', err.message));
+  }
+  res.json({ ok: true });
+});
+
+// ---- Admin: feedback ----
+app.get('/api/admin/feedback', (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const rows = db.prepare(`
+    SELECT f.id, u.email, f.message, f.created_at
+    FROM feedback f
+    JOIN users u ON u.id = f.user_id
+    ORDER BY f.created_at DESC
+  `).all();
+  res.json(rows);
 });
 
 // ---- Admin: all entries table ----

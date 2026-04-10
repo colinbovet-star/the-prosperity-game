@@ -370,6 +370,28 @@ app.get('/api/admin/dashboard', (req, res) => {
   });
 });
 
+// ---- Admin: all entries table ----
+app.get('/api/admin/entries', (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (!process.env.ADMIN_KEY || key !== process.env.ADMIN_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const rows = db.prepare(`
+    SELECT
+      ue.id,
+      u.email,
+      ue.day_number,
+      ue.amount,
+      ue.spending_items,
+      ue.created_at
+    FROM user_entries ue
+    JOIN users u ON u.id = ue.user_id
+    ORDER BY ue.created_at DESC
+    LIMIT 500
+  `).all();
+  res.json(rows);
+});
+
 // ---- Admin: send early-user thank-you email ----
 app.post('/api/admin/send-early-user-email', async (req, res) => {
   const key = req.headers['x-admin-key'];

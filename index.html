@@ -1933,6 +1933,37 @@
       padding: 3rem;
       font-size: 0.9rem;
     }
+    /* ---- Admin entries table ---- */
+    .admin-entries-wrap { overflow-x: auto; }
+    .admin-entries-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      color: #3a2a0a;
+    }
+    .admin-entries-table th {
+      text-align: left;
+      font-size: 0.68rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #8a6a50;
+      border-bottom: 1.5px solid rgba(200,149,42,0.25);
+      padding: 0.45rem 0.7rem;
+      white-space: nowrap;
+    }
+    .admin-entries-table td {
+      padding: 0.5rem 0.7rem;
+      border-bottom: 1px solid rgba(200,149,42,0.1);
+      vertical-align: top;
+    }
+    .admin-entries-table tr:last-child td { border-bottom: none; }
+    .admin-entries-table tr:hover td { background: rgba(200,149,42,0.05); }
+    .aet-amount { font-weight: 600; color: #b8820a; white-space: nowrap; }
+    .aet-email  { color: #6a4a20; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .aet-items  { color: #5a4030; line-height: 1.5; }
+    .aet-item   { display: block; }
+    .aet-date   { color: #a08060; white-space: nowrap; }
+    .aet-day    { color: #8a6a50; white-space: nowrap; }
     .admin-device-breakdown {
       background: rgba(255,255,255,0.55);
       border-radius: 12px;
@@ -2020,6 +2051,7 @@
       <div class="admin-tab-group">
         <button class="admin-tab active" id="tab-hourly" onclick="adminSwitchTab('hourly')">Hourly (24h)</button>
         <button class="admin-tab" id="tab-daily" onclick="adminSwitchTab('daily')">Daily (30d)</button>
+        <button class="admin-tab" id="tab-entries" onclick="adminSwitchTab('entries')">Entries</button>
       </div>
       <button class="admin-refresh" onclick="adminLoad()">↻ Refresh</button>
     </div>
@@ -3631,6 +3663,8 @@
     _adminTab = tab;
     document.getElementById('tab-hourly').classList.toggle('active', tab === 'hourly');
     document.getElementById('tab-daily').classList.toggle('active', tab === 'daily');
+    document.getElementById('tab-entries').classList.toggle('active', tab === 'entries');
+    if (tab === 'entries') { adminLoadEntries(); return; }
     if (_adminData) adminRender(_adminData);
   }
 
@@ -3644,6 +3678,57 @@
     } catch (err) {
       document.getElementById('admin-content').innerHTML = `<div class="admin-error">Error: ${err.message}</div>`;
     }
+  }
+
+  async function adminLoadEntries() {
+    document.getElementById('admin-content').innerHTML = '<div class="admin-loading">Loading…</div>';
+    try {
+      const r = await fetch('/api/admin/entries', { headers: { 'X-Admin-Key': _adminKey } });
+      if (!r.ok) throw new Error('Unauthorized or server error');
+      const rows = await r.json();
+      adminRenderEntries(rows);
+    } catch (err) {
+      document.getElementById('admin-content').innerHTML = `<div class="admin-error">Error: ${err.message}</div>`;
+    }
+  }
+
+  function adminRenderEntries(rows) {
+    if (!rows.length) {
+      document.getElementById('admin-content').innerHTML = '<div class="admin-loading">No entries yet.</div>';
+      return;
+    }
+    const fmt = n => '$' + Number(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const fmtDate = s => s ? s.slice(0, 16).replace('T', ' ') : '';
+    const rowsHtml = rows.map(row => {
+      const items = (() => { try { return JSON.parse(row.spending_items || '[]'); } catch { return []; } })();
+      const itemsHtml = items.length
+        ? items.filter(it => it.desc || it.price).map(it => {
+            const price = it.price ? ` <span style="color:#b8820a">(${fmt(it.price)})</span>` : '';
+            return `<span class="aet-item">${it.desc || '—'}${price}</span>`;
+          }).join('')
+        : '<span class="aet-item" style="color:#bbb">—</span>';
+      return `<tr>
+        <td class="aet-date">${fmtDate(row.created_at)}</td>
+        <td class="aet-email" title="${row.email}">${row.email}</td>
+        <td class="aet-day">Day ${row.day_number}</td>
+        <td class="aet-amount">${fmt(row.amount)}</td>
+        <td class="aet-items">${itemsHtml}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('admin-content').innerHTML = `
+      <div class="admin-entries-wrap">
+        <table class="admin-entries-table">
+          <thead><tr>
+            <th>Date</th>
+            <th>User</th>
+            <th>Day</th>
+            <th>Deposit</th>
+            <th>Items</th>
+          </tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>`;
   }
 
   function adminRender(data) {

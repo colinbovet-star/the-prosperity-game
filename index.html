@@ -3892,6 +3892,21 @@
         </div>
       </div>`;
 
+    const linkPct = t.entries > 0 ? Math.round(t.entries_with_link / t.entries * 100) : 0;
+    const linkHtml = `
+      <div class="admin-device-breakdown">
+        <div class="admin-device-title">Link Feature Usage</div>
+        <div class="admin-device-bars">
+          <div class="admin-device-row">
+            <span class="admin-device-label">With link</span>
+            <div class="admin-device-bar-wrap">
+              <div class="admin-device-bar admin-device-bar--mobile" style="width:${linkPct}%"></div>
+            </div>
+            <span class="admin-device-pct">${linkPct}% <span class="admin-device-count">(${t.entries_with_link.toLocaleString()} of ${t.entries.toLocaleString()})</span></span>
+          </div>
+        </div>
+      </div>`;
+
     const chartsHtml = `
       <div class="admin-charts">
         ${adminChartCard('Pageviews', rows, 'pageviews')}
@@ -3900,7 +3915,7 @@
         ${adminChartCard('Repeat Visits', rows, 'repeat_visits')}
       </div>`;
 
-    document.getElementById('admin-content').innerHTML = totalsHtml + deviceHtml + chartsHtml;
+    document.getElementById('admin-content').innerHTML = totalsHtml + deviceHtml + linkHtml + chartsHtml;
   }
 
   function adminTotalCard(label, value) {

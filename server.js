@@ -371,6 +371,7 @@ app.get('/api/admin/dashboard', (req, res) => {
       mobile_views:  mobileViews,
       desktop_views: knownViews - mobileViews,
       known_views:   knownViews,
+      entries_with_link: db.prepare("SELECT COUNT(*) as n FROM user_entries WHERE spending_items LIKE '%\"link\":\"%http%'").get().n,
     },
     hourly: mergeRows(hourlyPv, hourlySignups, hourlyEntries),
     daily:  mergeRows(dailyPv,  dailySignups,  dailyEntries),

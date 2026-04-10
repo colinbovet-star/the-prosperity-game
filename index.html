@@ -1808,7 +1808,8 @@
     }
     /* Pending / skipped */
     .dc-pending { font-size: 0.88rem; color: #b09060; font-style: italic; }
-    .dc-skipped { padding: 0.65rem 1.1rem; font-size: 0.81rem; color: #c0b090; font-style: italic; }
+    .dc-skipped { padding: 0.65rem 1.1rem 0.3rem; font-size: 0.81rem; color: #c0b090; font-style: italic; }
+    .dc-skipped-cta { padding: 0 1.1rem 0.6rem; font-size: 0.78rem; color: var(--gold); font-style: normal; font-weight: 600; }
 
     /* Summary footer */
     .history-stats-row {
@@ -3364,9 +3365,12 @@
       const dateFull = new Date(dateISO + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
       const dateShort = formatDateShort(dateISO);
 
-      // ---- Skipped ----
+      // ---- Skipped (past day with no entry — clickable to add retroactively) ----
       if (!hasAnyEntry && !isToday) {
-        html += `<div class="day-card skipped"><div class="dc-skipped">Day ${d} · ${dateShort} · Not journaled yet</div></div>`;
+        html += `<div class="day-card skipped clickable" onclick="editPastDay(${d})">
+          <div class="dc-skipped">Day ${d} · ${dateShort} · Not journaled yet</div>
+          <div class="dc-skipped-cta">Add entry +</div>
+        </div>`;
         continue;
       }
 

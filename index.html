@@ -1676,6 +1676,7 @@
 
     /* ---- Day Cards ---- */
     .day-card {
+      position: relative;
       border-radius: var(--radius-lg);
       overflow: hidden;
       border: 1px solid var(--border);
@@ -1689,6 +1690,33 @@
       background: #fafaf8;
       border-color: #ede8de;
       box-shadow: none;
+    }
+    /* Edit affordance on past-day cards */
+    .dc-edit-btn {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      z-index: 2;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: none;
+      background: rgba(20,14,4,0.55);
+      color: #fff;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.15s, transform 0.15s, background 0.15s;
+    }
+    .dc-edit-btn:hover { background: var(--gold); }
+    .day-card:hover .dc-edit-btn { opacity: 1; transform: scale(1); }
+    /* Touch devices have no hover state — keep the pencil persistently visible */
+    @media (hover: none) {
+      .dc-edit-btn { opacity: 1; transform: scale(1); }
     }
     /* Hero image */
     .dc-hero {
@@ -3073,8 +3101,9 @@
     updateEntryStatus();
     todayItems.forEach((item, i) => { if (item.link) fetchItemPreview(i); });
 
-    // Restore closed-out state if this day was already fully spent and saved
-    if (entry) {
+    // Restore closed-out celebration only for today — past days always open editable,
+    // since the celebration screen has no way back into the edit form.
+    if (entry && d === todayDayNumber) {
       const deposit = amountForDay(d);
       const spent = parsed.reduce((s, it) => s + (parseFloat(it.price) || 0), 0);
       if (spent > 0 && Math.abs(deposit - spent) < 0.005) {
@@ -3426,11 +3455,12 @@
         : '';
       const todayBadge = isToday ? `<span class="dc-today-badge">Today</span>` : '';
       const clickAttr  = isToday ? 'onclick="scrollToToday()"' : `onclick="editPastDay(${d})"`;
-
+      const editBtn    = isToday ? '' : `<button class="dc-edit-btn" onclick="event.stopPropagation();editPastDay(${d})" title="Edit this entry" aria-label="Edit this entry">✏️</button>`;
 
       if (heroImage) {
         html += `
           <div class="day-card journaled clickable" ${clickAttr}>
+            ${editBtn}
             <div class="dc-hero">
               <img class="dc-hero-img" src="${escHtml(heroImage)}" alt="" onerror="this.style.opacity='0'">
               <div class="dc-hero-overlay">
@@ -3443,6 +3473,7 @@
       } else {
         html += `
           <div class="day-card journaled clickable" ${clickAttr}>
+            ${editBtn}
             <div class="dc-header">
               <span class="dc-day-label">Day ${d}</span>
               <span class="dc-date">${dateFull}</span>
@@ -3615,10 +3646,11 @@
       addBtn.addEventListener('animationend', () => addBtn.classList.remove('pulse'), { once: true });
     }
 
-    // Show closed-out celebration if fully spent
+    // Show closed-out celebration if fully spent (today only — past-day edits should
+    // stay in the editable form so the entry remains easy to keep adjusting)
     const deposit = amountForDay(activeDayNumber);
     const total = items.reduce((s, it) => s + (parseFloat(it.price) || 0), 0);
-    if (total > 0 && Math.abs(deposit - total) < 0.005) {
+    if (activeDayNumber === todayDayNumber && total > 0 && Math.abs(deposit - total) < 0.005) {
       showClosedOut();
     }
 
